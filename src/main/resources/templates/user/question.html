@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>信息(动态生成)——校园智慧讯息平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/asserts/css/bootstrap.min.css}" href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+
+    <link th:href="@{/asserts/css/font-awesome.min.css}" href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 本地CSS -->
+    <link th:href="@{/asserts/css/nav-common.css}" href="../asserts/css/nav-common.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/question.css}" href="../asserts/css/question.css" rel="stylesheet">
+
+    <!--下拉框动态效果-->
+    <link th:href="@{/asserts/css/animations.css}" href="../asserts/css/animations.css" rel="stylesheet">
+    <!--头像弹出框-->
+    <link th:href="@{/asserts/css/bootstrap-popover-x.css}" href="../asserts/css/bootstrap-popover-x.css" media="all"
+          rel="stylesheet" type="text/css"/>
+
+</head>
+<body style="background-color: #F6F4EC;">
+
+<!--head：导航条+搜索框-->
+<div>
+    <!--引入导航条-->
+    <div th:replace="~{commons/bar::topbar}"></div>
+    <!--引入许愿模态框-->
+    <div th:replace="~{commons/bar::ask_question}"></div>
+    <!--引入反馈模态框-->
+    <div th:replace="~{commons/bar::feedback}"></div>
+
+    <!--问题-->
+    <div class="QuestionHeader col-md-6 col-md-offset-2">
+        <input id="session-id" type="hidden" th:if="${session.user!=null}" th:value="${session.user.id}">
+        <input id="session-role" type="hidden" th:if="${session.user!=null}" th:value="${session.user.role}">
+        <div class="QuestionTag" id="tag-list"></div>
+        <div class="QuestionTitle" id="question-title">
+        </div>
+        <div class="QuestionContent" id="question-content">
+        </div>
+        <div class="QuestionAttr">
+            <!--<button class="btn btn-default" style="color: #76839B;">关注问题</button>-->
+            <div id="toAnswer-url-tmp" class="font-bg" style="display:inline-block">
+                <a class="btn btn-default" style="color: #76839B;margin-right: 5px;margin-left: 5px;display: none;"
+                   id="toAnswer-url">
+                    <i class="glyphicon glyphicon-pencil"></i>写回答</a>
+            </div>
+
+            <button id="share" class="btn btn-default question-attr-share" style="width: 85px;"><i
+                    class="glyphicon glyphicon-send"></i>&nbsp;&nbsp;分享
+            </button>
+        </div>
+    </div>
+
+
+    <div id="main" class="col-md-6 col-md-offset-2 QuestionMain">
+        <div class="ListHeader">
+            <div class="ListHeader-total"><span id="answer-count"></span>&nbsp;个回答(左右键切换答案)</div>
+            <div class="dropdown" style="float: right;">
+            <span class="btn btn-default dropdown-toggle order-btn" style="color: #76839B" type="btn" id="order-str"
+                  data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="true">排序方式 <span class="caret"></span>
+            </span>
+                <ul class="dropdown-menu animated" data-animation="fadeInDown" aria-labelledby="order-str"
+                    style="min-width: 90px;background-color: #F6F4EC;color: #76839B">
+                    <li class="order-item font-bg"><a style="color: #76839B;" id="order-time" href="#">最多点赞</a></li>
+                    <li class="order-item font-bg"><a style="color: #76839B;" id="order-collect" href="#">最多收藏</a></li>
+                    <li class="order-item font-bg"><a style="color: #76839B;" id="order-view" href="#">最多评论</a></li>
+                    <li class="order-item font-bg"><a style="color: #76839B;" id="order-answer" href="#">最新时间</a></li>
+                </ul>
+            </div>
+            <a>
+                <div id="answer-rewrite" style="color: #76839B; float: right; margin-right: 5px; display: none;"
+                     class="btn btn-default"><i
+                        class="glyphicon glyphicon-pencil"></i>重新编辑
+                </div>
+            </a>
+            <div th:if="${session.user!=null && session.user.role=='admin'}" id="answer-delete" class="btn btn-danger"
+                 style="float: right;margin-right: 10px;" data-toggle="modal" data-target="#modal-delete"><i
+                    class="fa fa-trash"></i>删除
+            </div>
+            <div th:if="${session.user!=null && session.user.role=='admin'}" id="answer-warn" class="btn btn-warning"
+                 style="float: right;margin-right: 10px;" data-toggle="modal" data-target="#modal-delete"><i
+                    class="fa fa-exclamation-triangle"></i>警告
+            </div>
+        </div>
+        <div id="ListItem" class="ListItem">
+            <div class="mod-head">
+                <div id="answer-null" class="mod-head-null">还没有人回答...</div>
+                <!--用户头像-->
+                <div class="mod-head-user" data-toggle="popover-x" data-target="#avater-popover" data-placement="right">
+                    <a id="user-homepage"><img id="mod-head-user-img" class="mod-head-user-img"></a>
+                </div>
+                <div id="mod-head-user-name" class="mod-head-user-name">
+                </div>
+                <div id="mod-head-user-info"></div>
+            </div>
+            <div id="mod-body" class="mod-body">
+            </div>
+            <div id="more-body" class="more-body">
+                <div id="more-btn" class="more-btn">展示全文&nbsp;&nbsp;<i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+            </div>
+            <div id="mod-attr" class="mod-attr">
+                <span id="mod-attr-up" class="mod-tag"></span>
+                <span id="mod-attr-down" class="mod-tag"></span>
+                <span id="mod-attr-star" class="mod-tag"></span>
+                <a id="mod-attr-comment" class="mod-tag" data-toggle="modal" data-target=".comment"></a>
+                <span style="float: right" id="mod-attr-time"></span>
+            </div>
+        </div>
+        <!--<div class="ListItem" >
+            <div class="mod-head">
+                &lt;!&ndash;用户头像&ndash;&gt;
+                <div class="mod-head-user">
+                    <img class="mod-head-user-img" src="../asserts/img/user-default.jpg">
+                </div>
+                <div class="mod-head-user-info">
+                    工具人No.1
+                </div>
+                <div>我特么的就是一个工具人！</div>
+            </div>
+            <div class="mod-body">
+                我不知道，反正我是楼上造出来的。
+            </div>
+            <div class="mod-attr">
+                <span class="mod-tag"><i class="glyphicon glyphicon-thumbs-up"></i> 10086</span>
+                <span class="mod-tag"><i class="glyphicon glyphicon-star-empty"></i> 124</span>
+                <span class="mod-tag"><i class="glyphicon glyphicon-comment"></i> 1280</span>
+                <span style="float: right">更新于 2020-05-08</span>
+            </div>
+        </div>-->
+
+        <!--评论模态框-->
+        <div class="modal fade comment" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">查看对话</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mdl-head"><span id="comment-count">5</span>&nbsp;条回复</div>
+                        <div id="mdl-body" class="mdl-body">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <input id="comment-content" type="text" class="form-control" style="width: 88%; float: left;"
+                               placeholder="写下你的回复...">
+                        <button id="comment-btn" type="button" class="btn btn-info">发布</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!--管理员删除模态框-->
+        <div id="modal-delete" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 id="modal-delete-title" class="modal-title"></h4>
+                    </div>
+                    <div id="modal-delete-name" class="modal-body"></div>
+                    <div id="modal-delete-content" class="modal-body"></div>
+                    <input type="text" id="modal-delete-message" placeholder="理由，不超过60字"
+                           class="form-control  modal-delete-message"/>
+                    <div class="modal-footer">
+                        <button id="modal-delete-btn" class="btn btn-danger">删除</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!--重新编辑问题模态框-->
+        <div id="modal-re-edit" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 id="modal-edit-title" class="modal-title" style="color: #7687AB">重新编辑...</h4>
+                    </div>
+                    <input type="text" id="modal-edit-content1" placeholder="标题..." class="form-control ask_title"
+                           style="width: 94%;margin-left: 3%;margin-top: 3%;"/>
+                    <textarea id="modal-edit-content2" class="form-control ask_content" rows="8"
+                              style="width: 94%;margin-left: 3%;margin-top: 3%;"
+                              placeholder="正文..."></textarea>
+                    <div class="modal-footer">
+                        <button id="modal-edit-btn" class="btn btn-info">发布</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!--头像弹出框-->
+        <div id="avater-popover" class="popover popover-default" style="margin-top: 140px;background-color: #F6F4EC;">
+            <div class="popover-content">
+                <div>
+                    <div class="popover-head">提问</div>
+                    <div class="popover-head">回答</div>
+                    <div class="popover-head">粉丝</div>
+                </div>
+                <div style="height: 40px;padding-top: 24px">
+                    <div id="user-question-count" class="popover-head"></div>
+                    <div id="user-answer-count" class="popover-head"></div>
+                    <div id="user-follower" class="popover-head"></div>
+                </div>
+                <button id="follow-btn" class="btn btn-info"
+                        style="width: 100%;margin-top: 10px;margin-bottom: 6px;display: none;">关注ta
+                </button>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+</body>
+
+<!--jquery-->
+<script th:src="@{/asserts/js/jquery-3.3.1.min.js}" src="../asserts/js/jquery-3.3.1.min.js"></script>
+
+<script th:src="@{/asserts/js/bootstrap.min.js}" src="../asserts/js/bootstrap.min.js"></script>
+<!-- 下拉动态效果 -->
+<script th:src="@{/asserts/js/bootstrap-dropdown-on-hover.js}"
+        src="../asserts/js/bootstrap-dropdown-on-hover.js"></script>
+<!--头像弹出框-->
+<script th:src="@{/asserts/js/bootstrap-popover-x.js}" src="../asserts/js/bootstrap-popover-x.js"
+        type="text/javascript"></script>
+<script th:src="@{/asserts/layer/layer.js}"></script>
+<script th:src="@{/asserts/js/jquery.zeroclipboard.min.js}"></script>
+<script th:src="@{/asserts/js/ZeroClipboard.swf}"></script>
+
+<!--引入发表问题-->
+<script th:replace="~{commons/bar::select_tag}"></script>
+
+
+<!--获取回答-->
+<script>
+    $(document).ready(function () {
+
+
+        var curUrl = window.location.pathname;
+        var tipFlag = false;
+        var questionFlag; //是否关注问题
+        var collectFlag; //是否收藏了回答
+        var collectCountCur; //前端显示的收藏数
+        var answerLikeFlag; //是否点赞了回答
+        var answerLikeCountCur; //前端显示的回答点赞数
+        var answerDislikeFlag; //是否踩了回答
+        var answerDislikeCountCur; //前端显示的回答踩数
+        var followBtnFlag; //是否关注了用户
+        var sessionAnswerId; //session用户在该问题下回答的Id
+        var sessionId = $("#session-id").val();
+//        var questionId = curUrl.replace(/[^0-9]/ig, "");
+        var questionId = 0; //从url获取的
+        var answerId = 0; //从url获取的(如果url没有/answer/, 回答id就用answer.id获取
+        var questionAuthorId;
+        var orderStr = $("#order-str").text().trim(), orderColumn;
+        var tagList;
+        var question;
+        var user;
+        var answer;
+        var curPage = 1;
+        var total;
+
+        /*从url获取questionId和answerId*/
+        getQuestionIdAndAnswerIdByUrl();
+        /*从后端取数据*/
+        if (answerId == 0) getDataAjax();
+        /*根据左右键切换回答*/
+        chcangeAnswerByKey();
+        /*排序点击事件*/
+        orderClick();
+        /*头像焦点事件*/
+        avaterHover();
+        /*关注按钮点击事件*/
+        questionFollowBtnDisplay();
+        /*收藏按钮点击事件*/
+        collectBtnClick();
+        /*回答点赞按钮点击事件*/
+        answerLikeBtnClick();
+        /*回答踩按钮点击事件*/
+        answerDislikeBtnClick();
+        /*评论按钮点击事件(模态框展现评论)*/
+        commentClick();
+        /*评论发布按钮点击事件(创建评论)*/
+        commentBtnClick();
+        /*关注按钮点击事件*/
+        followBtnClick();
+        /*评论删除按钮点击事件*/
+        commentDeleteClick();
+        /*评论模态框删除按钮点击事件*/
+        modalCommentDeleteClick();
+        /*回答删除按钮点击*/
+        answerDeleteClick();
+        /*模态框回答删除按钮点击*/
+        modalAnswerDeleteClick();
+        /*回答警告按钮点击*/
+        answerWarnClick();
+        /*模态框回答警告按钮点击*/
+        modalAnswerWarnClick();
+        /*问题重新编辑按钮点击*/
+        questionRewriteClick();
+        /*问题重新编辑模态框发布按钮点击*/
+        modalQuestionRewriteClick();
+        /*分享按钮被点击*/
+        shareClick();
+
+        function shareClick() {
+            $("#share").click(function () {
+                layer.msg('你自己复制链接不行吗？点我干嘛？', {icon: 3});
+            });
+        }
+
+        /*问题重新编辑按钮点击*/
+        function questionRewriteClick() {
+            $("body").on("click", "#question-rewrite", function () {
+                $("#modal-edit-content1").val($("#question-title").text());
+                $("#modal-edit-content2").val($("#question-content").text());
+            });
+        }
+
+        /*问题重新编辑模态框发布按钮点击*/
+        function modalQuestionRewriteClick() {
+            $("#modal-edit-btn").click(function () {
+                //前端校验
+                var titleLen = $("#modal-edit-content1").val().length;
+                var contentLen = $("#modal-edit-content2").val().length;
+                if (titleLen < 2 || titleLen > 40) {
+                    layer.msg('标题要在2-40个字符范围内！', function () {
+                    });
+                    return;
+                } else if (contentLen < 2 || contentLen > 200) {
+                    layer.msg('正文要在2-200个字符范围内！', function () {
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: "/user/editQuestion",
+                    type: "post",
+                    data: {
+                        questionId: questionId,
+                        title: $("#modal-edit-content1").val(),
+                        content: $("#modal-edit-content2").val()
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            $("#modal-re-edit").modal("hide");  //退出模态框
+                            $("#modal-edit-content1").val("");
+                            $("#modal-edit-content2").val("");
+                            layer.msg('发布成功！', {icon: 6});
+                            $(location).attr("href", "/user/question/" + questionId);
+                        } else {
+                            alert("发布失败！");
+                        }
+                    },
+                    error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+
+        /*回答警告按钮点击*/
+        function answerWarnClick() {
+            $("#answer-warn").click(function () {
+                $("#modal-delete-title").text("警告回答");
+                $("#modal-delete-name").text("用户名：" + $("#mod-head-user-name").text());
+                $("#modal-delete-content").text("");
+                $("#modal-delete-message").val("");
+                $("#modal-delete-btn").removeClass("delete-comment btn-danger").addClass("warn-answer btn-warning");
+                $("#modal-delete-btn").text("警告");
+            });
+        }
+
+        /*模态框回答警告按钮点击*/
+        function modalAnswerWarnClick() {
+            $("#modal-delete-btn").click(function () {
+                if (!$(this).hasClass("warn-answer")) return;
+                var told = confirm("确认警告该回答吗？");
+                if (told) {
+                    $.ajax({
+                        url: "/user/warnAnswer",
+                        type: "post",
+                        data: {answerId: answer.id, message: $("#modal-delete-message").val()},
+                        success: function (result) {
+                            if (result == true) {
+                                alert("警告成功！");
+                                $("#modal-delete").modal('hide');
+                            }
+                        }, error: function () {
+                            alert("error!");
+                        }
+                    })
+                }
+            });
+        }
+
+        /*回答删除按钮点击*/
+        function answerDeleteClick() {
+            $("#answer-delete").click(function () {
+                $("#modal-delete-title").text("删除回答");
+                $("#modal-delete-name").text("用户名：" + $("#mod-head-user-name").text());
+                $("#modal-delete-content").text("");
+                $("#modal-delete-message").val("");
+                $("#modal-delete-btn").removeClass("delete-comment warn-answer btn-warning").addClass("delete-answer btn-danger");
+                $("#modal-delete-btn").text("删除");
+            })
+        }
+
+        /*模态框回答删除按钮点击*/
+        function modalAnswerDeleteClick() {
+            $("#modal-delete-btn").click(function () {
+                if (!$(this).hasClass("delete-answer")) return;
+                var told = confirm("确认删除该回答吗？");
+                if (told) {
+                    $.ajax({
+                        url: "/user/deleteAnswer",
+                        type: "post",
+                        data: {answerId: answer.id, message: $("#modal-delete-message").val()},
+                        success: function (result) {
+                            if (result == true) {
+                                total--;
+                                if (curPage > total) curPage = total;
+                                alert("删除成功！");
+                                getDataAjax();
+                                $("#modal-delete").modal('hide');
+                            }
+                        }, error: function () {
+                            alert("error!");
+                        }
+                    })
+                }
+            });
+        }
+
+        function photoHoverDisplay() {
+            if(user.id != null) {
+                $.ajax({
+                    url: "/user/getAuthorPhotoInfo",
+                    type: "post",
+                    data: {userId:user.id},
+                    success: function (result) {
+                        $("#user-question-count").text(result.questionCount);
+                        $("#user-answer-count").text(result.answerCount);
+                        $("#user-follower").text(result.followerCount);
+                    },error: function () {
+                        alert("error!");
+                    }
+                })
+            }
+        }
+
+        /*关注按钮展示*/
+        function followBtnDisplay() {
+            /*在关注粉丝表中查找session的id是否是userId的粉丝*/
+            if (sessionId != null && sessionId != user.id) {
+                $("#follow-btn").css("display", "block");
+                $.ajax({
+                    url: "/user/isFollower",
+                    type: "post",
+                    data: {sessionId: sessionId, userId: user.id},
+                    success: function (result) {
+                        if (flag == true) {
+                            followBtnFlag = true;
+                            $("#follow-btn").removeClass("btn-info").addClass("btn-default").text("取消关注");
+                        } else {
+                            followBtnFlag = false;
+                            $("#follow-btn").removeClass("btn-default").addClass("btn-info").text("关注ta");
+                        }
+                    },
+                    error: function () {
+                        alert("error!");
+                    }
+                });
+            }
+            else {
+                $("#follow-btn").css("display", "none");
+            }
+        }
+
+        /*关注按钮点击事件*/
+        function followBtnClick() {
+            $("#follow-btn").click(function () {
+                if (followBtnFlag == null) return;
+                var followUrl;
+                if (followBtnFlag == false) followUrl = "/user/addFollow";
+                else followUrl = "/user/deleteFollow";
+                $.ajax({
+                    url: followUrl,
+                    type: "post",
+                    data: {sessionId: sessionId, userId: user.id},
+                    success: function (result) {
+                        if (result == false) {
+                            alert("操作失败！");
+                        }
+                        followBtnDisplay();
+                    },
+                    error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+
+        /*回答的重新编辑按钮显示*/
+        function answerRewriteBtnDisplay() {
+            if (sessionId == answer.authorId) {
+                $("#answer-rewrite").css("display", "block").parent("a").attr("href", "/user/answer/" + questionId + "/" + answer.id);
+            } else {
+                $("#answer-rewrite").css("display", "none");
+            }
+        }
+
+        /*展现评论数据*/
+        function commentDisplay() {
+            $.ajax({
+                url: "/user/showComment",
+                type: "post",
+                data: {answerId: answer.id},
+                success: function (result) {
+                    var total = result.total;
+                    var list = result.list;
+                    $("#comment-count").text(total);
+                    $("#answer-comment-count").text(total);
+                    $("#mdl-body").find(".mdl-item").remove();
+                    $("#comment-content").val("");
+                    for (var i in list) {
+                        var footId = "foot" + list[i].id;
+                        $("#mdl-body")
+                            .append("<div class=\"mdl-item\">\n" +
+                                "                                <div class=\"mdl-item-head\">\n" +
+                                "                                    <a href=" + list[i].userUrl + "><img class=\"mdl-item-photo\" src=" + list[i].photoUrl + "></a>\n" +
+                                "                                    <div class=\"mdl-name\">" + list[i].userName + "</div>\n" +
+                                "                                    <div class=\"mdl-time\">" + timeFormat(list[i].updateTime) + "</div>\n" +
+                                "                                </div>\n" +
+                                "                                <div class=\"mdl-item-body\">\n" + list[i].content +
+                                "                                </div>\n" +
+                                "                                <div id=" + footId + " class=\"mdl-item-foot\">\n" +
+                                /*"                                    <span><i class=\"glyphicon glyphicon-thumbs-up comment-like\"></i><span>" + list[i].likeCount + "</span></span>\n" +
+                                "                                    <span style=\"padding-left: 10px\"><i\n" +
+                                "                                            class=\"glyphicon glyphicon-thumbs-down comment-dislike\"></i><span>" + list[i].dislikeCount + "</span></span>" +*/
+                                "                                </div>\n" +
+                                "                            </div>");
+                        if ($("#session-role").val() == "admin") {
+                            $("#" + footId).append("<button class='btn btn-danger btn-sm comment-delete' data-toggle=\"modal\" data-target=\"#modal-delete\" style='float: right;' value=" + list[i].id + ">删除</button>");
+                        }
+                    }
+                },
+                error: function () {
+                    alert("error!");
+                }
+            });
+        }
+
+        /*评论删除按钮点击事件*/
+        function commentDeleteClick() {
+            $("body").on("click", ".comment-delete", function () {
+                $("#modal-delete-title").text("删除评论");
+                $("#modal-delete-name").text("用户名：" + $(this).parent().prev().prev().find(".mdl-name").text());
+                $("#modal-delete-content").text("评论内容：" + $(this).parent().prev().text());
+                $("#modal-delete-message").val("");
+                $("#modal-delete-btn").val($(this).val()).removeClass("delete-comment warn-answer btn-warning").addClass("delete-comment btn-danger");
+                $("#modal-delete-btn").text("删除");
+//                console.log($(this).parent().prev().text());
+//                console.log($(this).parent().prev().prev().find(".mdl-name").text());
+
+            });
+        }
+
+        /*评论模态框删除按钮点击事件*/
+        function modalCommentDeleteClick() {
+            $("#modal-delete-btn").click(function () {
+                if (!$(this).hasClass("delete-comment")) return;
+                var told = confirm("您确定要删除吗？");
+                if (told) {
+                    $.ajax({
+                        url: "/user/deleteComment",
+                        type: "post",
+                        data: {commentId: $(this).val(), message: $("#modal-delete-message").val()},
+                        success: function (result) {
+                            if (result) {
+                                alert("删除成功！");
+                                $("#modal-delete").modal('hide');
+                                commentDisplay();
+                            } else {
+                                alert("删除失败！");
+                            }
+                        },
+                        error: function () {
+                            alert("error!");
+                        }
+                    })
+                }
+            })
+        }
+
+        /*评论按钮点击事件(模态框展现评论)*/
+        function commentClick() {
+            $("#mod-attr-comment").click(function () {
+                $("#comment-content").val("");
+                commentDisplay();
+            });
+        }
+
+        /*评论发布按钮点击事件(创建评论)*/
+        function commentBtnClick() {
+            $("#comment-btn").click(function () {
+                if (sessionId == null) {
+                    layer.msg('请先登录！', function () {
+                    });
+                    return;
+                }
+                if ($("#comment-content").val() == "") {
+                    layer.msg('评论不能为空！', function () {
+                    });
+                } else {
+                    $.ajax({
+                        url: "/user/createComment",
+                        type: "post",
+                        data: {sessionId: sessionId, answerId: answer.id, content: $("#comment-content").val()},
+                        success: function (result) {
+                            if (result == true) {
+                                layer.msg('评论成功！', {icon: 6});
+                                commentDisplay();
+
+                            }
+                            else alert("评论失败！");
+
+                        }, error: function () {
+                            alert("error!");
+                        }
+                    });
+                }
+            })
+        }
+
+        /*通过回答id获取当前页*/
+        function getCurPageByAnswerId() {
+            if (answerId > 0) {
+                $.ajax({
+                    url: "/user/getCurPageByAnswerId",
+                    type: "post",
+                    data: {questionId: questionId, answerId: answerId},
+                    success: function (result) {
+                        if (result >= 1) curPage = result;
+                        getDataAjax();
+                    }, error: function () {
+                        alert("error!");
+                    }
+                });
+            }
+        }
+
+        /*从url获取questionId和answerId*/
+        function getQuestionIdAndAnswerIdByUrl() {
+            questionId = 0;
+            answerId = 0;
+            var qFlag = true; //true表示问题id录入，false表示回答id录入
+            var arr = curUrl.split('');
+            for (var i in arr) {
+                //如果不是数字
+                if (isNaN(arr[i])) {
+                    //不是数字且questionId>0，则表示questionId录入完
+                    if (questionId > 0) qFlag = false;
+                } else {
+                    if (qFlag == false) {
+                        answerId *= 10;
+                        answerId += parseInt(arr[i]);
+                    } else {
+                        questionId *= 10;
+                        questionId += parseInt(arr[i]);
+                    }
+                }
+            }
+            if (answerId > 0) getCurPageByAnswerId();
+        }
+
+        /*头像焦点事件*/
+        function avaterHover() {
+            var flag = false;
+            $("body").on("mouseenter", "#mod-head-user-img,#avater-popover", function () {
+                flag = true;
+                $("#avater-popover").css("display", "block");
+                followBtnDisplay();
+            });
+            $("body").on("mouseleave", "#mod-head-user-img,#avater-popover", function () {
+                flag = false;
+                setTimeout(function () {
+                    if (flag == false)
+                        $("#avater-popover").css("display", "none");
+                }, 300)
+            });
+        }
+
+        /*重新编辑按钮*/
+        function getReWriteBtn() {
+            if (sessionId == questionAuthorId) {
+                $("#question-rewrite").remove();
+                $("#toAnswer-url-tmp").after("<a data-toggle=\"modal\" data-target=\"#modal-re-edit\" class=\"btn btn-default\" style=\"color: #76839B;\" id=\"question-rewrite\"><i\n" +
+                    "            class=\"glyphicon glyphicon-pencil\"></i>&nbsp;&nbsp;重新编辑</a>");
+            }
+        }
+
+        /*根据左右键切换回答*/
+        function chcangeAnswerByKey() {
+            //39右键，37左键
+            $("body").keyup(function (event) {
+                var tmpFlag = false;
+
+                $(".modal").each(function () {
+                    if ($(this).hasClass("in")) {
+                        tmpFlag = true;
+                    }
+                });
+                if (tmpFlag == true) return;
+
+                if (event.keyCode == 37) {
+                    if (curPage <= 1) layer.msg('当前已经是第一个回答！', function () {
+                    });
+                    else {
+                        curPage--;
+                        getDataAjax();
+                        $('html,body').animate({scrollTop: 0}, 1);
+                    }
+                } else if (event.keyCode == 39) {
+                    if (curPage >= total) layer.msg('当前已经是最后一个回答！', function () {
+                    });
+                    else {
+                        curPage++;
+                        getDataAjax();
+                        $('html,body').animate({scrollTop: 0}, 1);
+                    }
+                }
+            });
+        }
+
+        /*从后端取数据*/
+        function getDataAjax() {
+            orderStrToOrderColumn();
+            var load = layer.msg('别急，服务器不大行...', {
+                icon: 16
+                , shade: 0.01
+            });
+            $.ajax({
+                url: "/user/question/" + questionId,
+                type: "post",
+                data: {questionId: questionId, curPage: curPage, orderColumn: orderColumn, sessionId: sessionId},
+                success: function (result) {
+                    //alert(result);
+                    sessionAnswerId = result.sessionAnswerId;
+                    questionFlag = result.questionFlag;
+                    collectFlag = result.collectFlag;
+                    answerLikeFlag = result.answerLikeFlag;
+                    answerDislikeFlag = result.answerDislikeFlag;
+                    tagList = result.tagList;
+                    question = result.question;
+                    user = result.user;
+                    answer = result.answer[0];
+                    if (answer != null) {
+                        collectCountCur = answer.collectCount;
+                        answerLikeCountCur = answer.likeCount;
+                        answerDislikeCountCur = answer.dislikeCount;
+                        console.log(answerLikeCountCur);
+                    }
+                    total = result.total;
+                    if (total == 0) {
+                        $("#answer-delete").css("display", "none");
+                    } else {
+                        $("#answer-delete").css("display", "block");
+                    }
+                    if (total == 0) {
+                        $("#answer-warn").css("display", "none");
+                    } else {
+                        $("#answer-warn").css("display", "block");
+                    }
+                    questionAuthorId = question.authorId;
+
+                    /*显示问题，回答，头像相关信息*/
+                    displayQuestion();
+                    displayAnswer();
+                    photoHoverDisplay();
+                    layer.close(load);
+                    // if(tipFlag == false) {
+                    //     tipFlag = true;
+                    //     layer.msg('可以通过键盘左右键进行翻页哦', {
+                    //         offset: 't',
+                    //         icon: 0,
+                    //         skin: 'layer-ext-moon'
+                    //     });
+                    // }
+                },
+                error: function () {
+                    alert("error!");
+                }
+            });
+        }
+
+        /*关注问题显示按钮*/
+        function questionFollowBtn() {
+            $("#question-follow").remove();
+            if (questionFlag == false) {
+                $("#toAnswer-url-tmp").before("<button id='question-follow' class=\"btn btn-info\">关注问题</button>");
+            } else {
+                $("#toAnswer-url-tmp").before("<button id='question-follow' class=\"btn btn-default\" style=\"color: #76839B;\">取消关注</button>");
+            }
+        }
+
+        /*关注问题按钮点击事件*/
+        function questionFollowBtnDisplay() {
+            $("body").on("click", "#question-follow", function () {
+                if (sessionId == null) {
+                    layer.msg('请先登录！', function () {
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/user/questionFollowClick",
+                    type: "post",
+                    data: {questionId: questionId, sessionId: sessionId},
+                    success: function (result) {
+                        questionFlag = result;
+                        if (questionFlag == true) layer.msg('关注成功！', {icon: 6});
+                        questionFollowBtn();
+
+                    }, error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+
+        /*收藏按钮显示*/
+        function collectBtn() {
+            if (collectFlag == true) {
+                $("#answer-collect").find("span").text(collectCountCur);
+                $("#answer-collect").find("i").removeClass("fa-star-o").addClass("fa-star").css("color", "sandybrown");
+            } else {
+                $("#answer-collect").find("span").text(collectCountCur);
+                $("#answer-collect").find("i").removeClass("fa-star").addClass("fa-star-o").css("color", "#7687AB");
+            }
+        }
+
+        /*收藏按钮点击事件*/
+        function collectBtnClick() {
+            $("body").on("click", "#answer-collect", function () {
+                if (sessionId == null) {
+                    layer.msg('请先登录！', function () {
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/user/collectClick",
+                    type: "post",
+                    data: {answerId: answer.id, sessionId: sessionId},
+                    success: function (result) {
+                        collectFlag = result;
+                        if (collectFlag == true) {
+                            collectCountCur++;
+                        }
+                        else collectCountCur--;
+                        collectBtn();
+                    }, error: function () {
+                        alert("error!");
+                    }
+                });
+                return false;
+            })
+        }
+
+        /*回答点赞按钮显示*/
+        function answerLikeBtn() {
+            if (answerLikeFlag == true) {
+                $("#answer-like").find("span").text(answerLikeCountCur);
+                $("#answer-like").find("i").removeClass("fa-thumbs-o-up").addClass("fa-thumbs-up").css("color", "cornflowerblue");
+            } else {
+                $("#answer-like").find("span").text(answerLikeCountCur);
+                $("#answer-like").find("i").removeClass("fa-thumbs-up").addClass("fa-thumbs-o-up").css("color", "#7687AB");
+            }
+        }
+
+        /*回答点赞按钮点击事件*/
+        function answerLikeBtnClick() {
+            /*$("body").on("mouseover mouseout", "#answer-like", function (event) {
+                if (event.type == "mouseover") {
+                    //鼠标悬浮
+                    $(this).find("i").removeClass("fa-thumbs-o-up").addClass("fa-thumbs-up");
+                } else if (event.type == "mouseout") {
+                    //鼠标离开
+                    if($(this).hasClass("fa-thumbs-o-up")) $(this).find("i").removeClass("fa-thumbs-up").addClass("fa-thumbs-o-up");
+                }
+            });*/
+
+            $("body").on("click", "#answer-like", function () {
+                if (sessionId == null) {
+                    layer.msg('请先登录！', function () {
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/user/answerLikeClick",
+                    type: "post",
+                    data: {answerId: answer.id, sessionId: sessionId},
+                    success: function (result) {
+                        answerLikeFlag = result;
+                        if (answerLikeFlag == true) {
+                            answerLikeCountCur++;
+                        }
+                        else answerLikeCountCur--;
+                        answerLikeBtn();
+                    }, error: function () {
+                        alert("error!");
+                    }
+                });
+                return false;
+            })
+        }
+
+        /*回答踩按钮显示*/
+        function answerDislikeBtn() {
+            if (answerDislikeFlag == true) {
+                $("#answer-dislike").find("span").text(answerDislikeCountCur);
+                $("#answer-dislike").find("i").removeClass("fa-thumbs-o-down").addClass("fa-thumbs-down").css("color", "cornflowerblue");
+            } else {
+                $("#answer-dislike").find("span").text(answerDislikeCountCur);
+                $("#answer-dislike").find("i").removeClass("fa-thumbs-down").addClass("fa-thumbs-o-down").css("color", "#7687AB");
+            }
+        }
+
+        /*回答踩按钮点击事件*/
+        function answerDislikeBtnClick() {
+            $("body").on("click", "#answer-dislike", function () {
+                if (sessionId == null) {
+                    layer.msg('请先登录！', function () {
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/user/answerDislikeClick",
+                    type: "post",
+                    data: {answerId: answer.id, sessionId: sessionId},
+                    success: function (result) {
+                        answerDislikeFlag = result;
+                        if (answerDislikeFlag == true) {
+                            answerDislikeCountCur++;
+                        }
+                        else answerDislikeCountCur--;
+                        answerDislikeBtn();
+                    }, error: function () {
+                        alert("error!");
+                    }
+                });
+                return false;
+            })
+        }
+
+        /*展示问题*/
+        function displayQuestion() {
+            //生成标签
+            if ($("#tag-list").children().length <= 0) {
+                for (var i in tagList) {
+                    $("#tag-list").append("<a href='#'><span class=\"tag-label font-bg\">" + tagList[i].tagName + "</span></a>");
+                }
+            }
+            $("#question-title").text(question.title);
+            $("#question-content").text(question.content);
+            if (sessionId != null) {
+                if (sessionAnswerId != null) {
+                    $("#toAnswer-url").attr("href", "/user/answer/" + question.id + "/" + sessionAnswerId);
+                } else {
+                    $("#toAnswer-url").attr("href", "/user/answer/" + question.id);
+                }
+                $("#toAnswer-url").css("display", "inline");
+            }
+
+            //关注问题按钮
+            questionFollowBtn();
+            //重新编辑按钮
+            getReWriteBtn();
+        }
+
+        /*展示回答*/
+        function displayAnswer() {
+            if (answer == null) {
+                $("#answer-null").css("display", "block");
+                $("#answer-count").text("0");
+                $("#mod-head-user-img").css("display", "none");
+                $("#order-str").css("display", "none");
+                $("#mod-head-user-name").css("display", "none");
+                $("#mod-head-user-info").css("display", "none");
+                $("#mod-body").css("display", "none");
+                $("#mod-attr").css("display", "none");
+                return;
+            }
+            $("#mod-head-user-img").css("display", "block");
+            $("#user-homepage").attr("href", "/user/homepage/" + user.id);
+            $("#order-str").css("display", "block");
+            $("#answer-null").css("display", "none");
+            $("#answer-count").text(total);
+            $("#mod-head-user-img").attr("src", user.photoUrl);
+            $("#mod-head-user-name").text(user.nickName);
+            $("#mod-head-user-info").text(user.signature);
+            $("#mod-body").text("").append(answer.content);
+            $(".editor-wrapper").removeClass().removeAttr("contenteditable"); //清除answer可编辑属性的痕迹
+            $("#mod-attr-up").find("span").remove();
+            $("#mod-attr-up").prepend("<span id='answer-like'><a href='#'><i class=\"fa fa-thumbs-o-up font-bg\"></i></a><span>" + answer.likeCount + "</span></span>");
+            $("#mod-attr-down").find("span").remove();
+            $("#mod-attr-down").prepend("<span id='answer-dislike'><a href='#'><i class=\"fa fa-thumbs-o-down font-bg\"></i></a><span>" + answer.dislikeCount + "</span></span>");
+            $("#mod-attr-star").find("span").remove();
+            $("#mod-attr-star").prepend("<span id='answer-collect'><a href='#'><i class=\"fa fa-star-o font-bg\"></i></a><span>" + answer.collectCount + "</span></span>");
+            $("#mod-attr-comment").find("span").remove();
+            $("#mod-attr-comment").prepend("<span><a href='#'><i class=\"glyphicon glyphicon-comment font-bg\"></i></a><span id='answer-comment-count'>" + answer.commentCount + "</span></span>");
+            $("#mod-attr-time").text("更新于 " + answer.updateTime);
+
+            /*收藏按钮显示*/
+            collectBtn();
+            /*回答点赞按钮显示*/
+            answerLikeBtn();
+            /*回答踩按钮显示*/
+            answerDislikeBtn();
+            /*重新编辑按钮显示*/
+            answerRewriteBtnDisplay();
+
+        }
+
+        /*将排序字符串转成对应字段*/
+        function orderStrToOrderColumn() {
+            if (orderStr == "排序方式" || orderStr == "最多点赞") {
+                orderColumn = "like_count";
+            } else if (orderStr == "最多收藏") {
+                orderColumn = "collect_count";
+            } else if (orderStr == "最多评论") {
+                orderColumn = "comment_count";
+            } else {
+                orderColumn = "update_time";
+            }
+        }
+
+        /*排序点击事件*/
+        function orderClick() {
+            $(".dropdown").hover(function () {
+                $(this).addClass("open");
+            },function () {
+                $(this).removeClass("open");
+            })
+
+            $(".order-item").click(function () {
+                orderStr = $(this).text();
+                $("#order-str").text(orderStr + " ").append("<span class=\"caret\"></span>");
+                curPage = 1;
+                getDataAjax();
+            });
+        }
+
+        /*展现全文*/
+        function moreEvent() {
+            var btn = document.getElementById('more-body'); //获取遮罩
+            var obj = document.getElementById('mod-body');  //获取正文
+            var body = document.getElementById('ListItem'); //获取模块
+
+            var total_height = $("#mod-body").height(); //正文高度
+            var show_height = 208; //显示高度
+            var fixed = 183; //高度修正(用于模块高度)
+
+            var body_height = show_height + fixed;
+            body.style.height = body_height + 'px'; //设置模块高度
+
+            btn.style.display = 'none'; //遮罩隐藏
+
+            if (total_height > show_height) { //文章总高度大于显示高度
+                obj.style.height = show_height + 'px';  //设置正文高度
+                btn.style.display = 'block'; //遮罩设为可见
+
+                /*点击展示*/
+                btn.onclick = function () {
+                    obj.style.height = total_height + 'px'; //设置正文高度
+                    btn.style.display = 'none'; //遮罩隐藏
+                    body_height = $("#mod-body").height() + fixed;
+                    body.style.height = body_height + 'px'; //设置模块高度
+                }
+            } else {
+                body_height = $("#mod-body").height() + fixed;
+                body.style.height = body_height + 'px'; //设置模块高度
+                btn.style.display = 'none'; //遮罩隐藏
+            }
+
+        }
+
+        /*时间格式转换*/
+        function timeFormat(time) {
+            var d = new Date(time);
+
+            var year = d.getFullYear();       //年
+            var month = d.getMonth() + 1;     //月
+            var day = d.getDate();            //日
+
+            var hh = d.getHours();            //时
+            var mm = d.getMinutes();          //分
+            var ss = d.getSeconds();           //秒
+
+            var clock = year + "-";
+
+            if (month < 10)
+                clock += "0";
+
+            clock += month + "-";
+
+            if (day < 10)
+                clock += "0";
+
+            clock += day + " ";
+
+            if (hh < 10)
+                clock += "0";
+
+            clock += hh + ":";
+            if (mm < 10) clock += '0';
+            clock += mm + ":";
+
+            if (ss < 10) clock += '0';
+            clock += ss;
+            return (clock);
+        }
+
+    });
+</script>
+
+
+</html>

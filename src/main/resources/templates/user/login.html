@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>登录页——校园智慧讯息平台</title>
+
+    <!-- Bootstrap -->
+    <link href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../asserts/css/nprogress.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="../asserts/css/animate.min.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../asserts/css/login.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="login_main">
+    <!--<img src="../asserts/img/login_wallpaper.jpg" height="801px" width="100%">-->
+    <div class="login_body">
+        <form class="" th:action="@{/login}" method="post">
+            <img class="login_title" src="../asserts/img/kd.png" width="126px">
+            <br>
+            <div id="alert_msg" class="alert alert-danger" style="width: 90%;margin-bottom: 32px;display: none;" th:text="${msg}">af</div>
+
+            <div class="form-group">
+                <input type="text" id="edit_name" name="username" class="form-control" placeholder="用户名/邮箱"
+                       required=""/>
+                <i class="form-icon"></i>
+                <span class="help-block"></span>
+            </div>
+            <div class="form-group">
+                <input type="password" id="edit_password" name="password" class="form-control" placeholder="密码"
+                       required=""/>
+                <i class="form-icon"></i>
+                <span class="help-block"></span>
+            </div>
+
+            <div class="form-group">
+                <input id="edit_login" type="submit" th:value="登录" class="btn btn-info btn-lg btn-block"
+                       style="font-size: 16px; width: 90%"/>
+                <i class="form-icon"></i>
+            </div>
+            <a href="/toRegister">
+                <div id="toReg" class="font-bg" style="margin-right: 40px;color: darkseagreen;float: right;">没有账号？前往注册<i class="fa fa-angle-double-right"></i></div>
+            </a>
+        </form>
+
+    </div>
+</div>
+</body>
+<!--jquery-->
+<script src="../asserts/js/jquery-3.3.1.min.js"></script>
+<script th:src="@{/asserts/layer/layer.js}"></script>
+<!--bootstrap-->
+<!--<script src="../asserts/js/bootstrap.min.js"></script>-->
+
+
+<!--前端校验-->
+<script>
+
+    //清除样式和内容
+    function clearMsg(ele) {
+        $(ele).next("i").removeClass("glyphicon glyphicon-ok glyphicon-remove").next("span").text("");
+    }
+
+    //校验信息，参数为组件，状态，信息. 在input的父组件(div)加样式，span加消息提示
+    function show_validate_msg(ele, status, msg) {
+        /*先清除原来的痕迹(样式，内容)*/
+        clearMsg(ele);
+
+        if ("success" == status) {
+            $(ele).next("i").addClass("glyphicon glyphicon-ok").css("color","#3CB371").next("span").text(msg).css("color","#3CB371");
+
+        } else if ("error" == status) {
+            $(ele).next("i").addClass("glyphicon glyphicon-remove").css("color","#E9686B").next("span").text(msg).css("color","#E9686B");
+        }
+    }
+
+    $(document).ready(function() {
+        if($("#alert_msg").text() != ""){
+            $("#alert_msg").css("display","block");
+        }
+    });
+
+
+
+</script>
+
+
+</html>

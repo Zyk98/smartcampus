@@ -1,0 +1,116 @@
+.main{
+    margin-top: 20px;
+}
+
+.list-num {
+    float: right;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    color: #76839B;
+}
+
+.home-photo {
+    width: 100%;
+}
+
+.home-name {
+    text-align: center;
+    padding-top: 10px;
+    font-weight: bolder;
+    padding-bottom: 28px;
+    font-size: 18px;
+}
+
+.home-leftside {
+    float: left;
+    width: 12%;
+    margin-left: 112px;
+}
+
+.home-main {
+    margin-left: 10%;
+}
+
+.home-main-body {
+    margin-top: 36px;
+}
+
+.home-main-icon {
+    float: left;
+    width: 50px;
+    height: 110px;
+    line-height: 90px;
+    font-size: 30px;
+}
+
+.home-main-img {
+    float: left;
+    margin-top: 24px;
+    margin-right: 20px;
+    width: 50px;
+    height: 50px;
+    border: 1px solid #dddddd;
+}
+
+
+.home-main-item {
+    margin-top: 20px;
+    border-top: 1px solid #dddddd;
+    line-height: 16px;
+}
+
+.home-main-list {
+    padding-top: 24px;
+    margin-bottom: 40px;
+}
+
+
+.body-content {
+    font-size: 16px;
+    font-weight: bold;
+    width: 72%;
+    line-height: 20px;
+}
+
+.body-msg {
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.body-time {
+    float: right;
+    color: #76839B;
+}
+
+.body-comment {
+    float: right;
+    padding-right: 20px;
+    color: #76839B;
+}
+
+.body-user {
+    color: #76839B;
+}
+
+
+
+.body-view {
+    float: right;
+    padding-right: 20px;
+    color: #76839B;
+}
+
+.message-delete-btn {
+    float: right;
+    margin-left: 10px;
+}
+
+.feedback-delete-btn {
+    float: right;
+    margin-left: 10px;
+}
+
+i{
+    padding-right: 5px;
+}

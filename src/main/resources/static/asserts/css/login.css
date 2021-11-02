@@ -1,0 +1,93 @@
+a{
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+body {
+    /*background-image: url("../asserts/img/login_wallpaper.jpg");*/
+   /* background: url(../img/login_wallpaper.jpg);
+    width: 100%;
+    height: 801px;*/
+    background-image: url("../img/login_5.png");
+}
+
+.login_body {
+    padding: 5%;
+    width: 505px;
+    margin-left: 56px;
+
+}
+
+.login_main {
+    width: 36%;
+    margin-top: 6%;
+    margin-left: 29%;
+    background: rgba(255,255,255,0.1);
+
+}
+
+.login_title {
+    margin-bottom: 25px;
+    margin-left: 136px;
+}
+
+.form-group {
+    margin-bottom: 30px;
+    height: 55px;
+}
+
+.form-control{
+    height: 44.67px;
+    background: rgba(148,176,198,0.4);
+    color: #dddddd;
+    font-size: 16px;
+    width: 90%;
+    float: left;
+}
+
+.form-icon {
+    padding-top: 4px;
+    font-size: 34px;
+}
+
+.help-block {
+    float: left;
+    color: #3CB371;
+    font-size: 15px;
+}
+
+
+
+input::-webkit-input-placeholder {
+    /* WebKit browsers */
+    color: #ddd !important;
+}
+input:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #ddd !important;
+}
+input::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #ddd !important;
+}
+input:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #ddd !important;
+}
+
+.font-bg {
+    transition: 0.2s;
+}
+
+.font-bg:hover {
+    transform:scale(1.2);
+}
+
+
+
+i{
+    padding-right: 7px;
+}

@@ -1,0 +1,90 @@
+body,p,ul {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #0c9;
+    color: #333;
+}
+.content {
+    padding-top: 5%;
+}
+.content .select {
+    width: 300px;
+    height: 40px;
+    margin: 0 auto;
+    font-family: "Microsoft Yahei";
+    font-size: 16px;
+    background-color: #fff;
+    position: relative;
+}
+/*transform(缩放、旋转、平移)，显示的是最终效果，没有动画过程*/
+/*transition是对元素本身的属性(比如：width、height)设置动画效果*/
+.content .select:after {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-left: 1px #ccc solid;
+    border-bottom: 1px #ccc solid;
+    position: absolute;
+    top: 11px;
+    right: 12px;
+    /*transform: rotate(-45deg);*/
+}
+.content .select p {
+    padding: 0 15px;
+    line-height: 40px;
+    cursor: pointer;
+}
+/*设置下拉框收起时的高度过渡动画*/
+.content .select ul {
+    list-style-type: none;
+    background-color: #fff;
+    width: 100%;
+    overflow-y: auto;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    max-height: 0;
+    transition: max-height .1s ease-out;
+}
+.content .select ul li {
+    padding: 0 15px;
+    line-height: 40px;
+    cursor: pointer;
+}
+/*.content .select ul li:hover {
+    background-color: #e0e0e0;
+}
+.content .select ul li.selected {
+    background-color: #39f;
+    color: #fff;
+}*/
+/*下拉框展开时调用动画slide-down*/
+/*transform-origin设置缩放下拉框的基点位置*/
+.content .select.open ul {
+    max-height: 250px;
+    /*-webkit-animation: slide-down .5s ease-in;*/
+    transition: max-height .1s ease-in;
+    transform-origin: 50% 0;
+}
+
+/*为下拉框展开时添加名称为slide-down的关键帧动画*/
+@-webkit-keyframes slide-down {
+    0% {
+        transform: scale(1, 0);
+    }
+    25% {
+        transform: scale(1, 1.2);
+    }
+    50% {
+        transform: scale(1, 0.85);
+    }
+    75% {
+        transform: scale(1, 1.05);
+    }
+    100% {
+        transform: scale(1, 1);
+    }
+}

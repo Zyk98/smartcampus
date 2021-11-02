@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人信息——校园智慧讯息平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/asserts/css/bootstrap.min.css}" href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link th:href="@{/asserts/css/font-awesome.min.css}" href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 本地CSS -->
+    <link th:href="@{/asserts/css/nav-common.css}" href="../asserts/css/nav-common.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/settings-info.css}" href="../asserts/css/settings-info.css" rel="stylesheet">
+
+    <!--下拉框动态效果-->
+    <link th:href="@{/asserts/css/animations.css}" href="../asserts/css/animations.css" rel="stylesheet">
+</head>
+
+<body style="background-color: #F6F4EC">
+<!--head：导航条+搜索框-->
+<div>
+    <!--引入导航条-->
+    <div th:replace="~{commons/bar::topbar}"></div>
+
+    <div class="info-main">
+        <div class="info-leftside">
+            <div class="info-leftside-group">
+                <a href="#" class="info-leftside-item active"><i class="glyphicon glyphicon-user"></i>基本信息</a>
+                <a id="account-password" href="#" class="info-leftside-item"><i class="glyphicon glyphicon-lock"></i>账号密码</a>
+            </div>
+        </div>
+
+        <div class="info-body col-md-7">
+            <form id="form-data" class="form-horizontal">
+                <input id="user-id" type="hidden" name="id" th:value="${user.id}">
+                <input type="hidden" id="session-id" th:if="${session.user!=null}" th:value="${session.user.id}">
+
+
+
+                <div class="form-group">
+                    <label for="form-email" class="col-sm-2 control-label">邮箱</label>
+                    <div class="col-sm-10">
+                        <span class="" th:text="${user.email}" id="form-email"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form-name" class="col-sm-2 control-label">昵称</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="nickName" th:value="${user.nickName}" class="form-control"
+                               id="form-name" placeholder="输入的昵称...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form-gender"
+                           class="col-sm-2 control-label">性别</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" name="gender"
+                                id="form-gender">
+                            <option th:selected="${user.gender}" value="1">男</option>
+                            <option value="0">女</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form-birth" class="col-sm-2 control-label">生日</label>
+                    <div class="col-sm-10">
+                        <input type="date" th:value="${user.birth}" class="form-control" id="form-birth" name="birth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form-signature" class="col-sm-2 control-label">个性签名</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="signature" th:value="${user.signature}" class="form-control"
+                               id="form-signature" placeholder="写下展示你个性的签名吧...">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-rightside col-md-2">
+            <img id="form-photo" class="info-rightside-img" th:src="@{${user.photoUrl}}">
+            <form id="form-img">
+                <div class="form-group info-rightside-form">
+                    <label for="form-upload">上传头像<p
+                            style="letter-spacing: normal; font-size: small; font-weight: normal">支持.jpg, .png,
+                        .jpeg</p></label>
+                    <input name="file" class="" type="file" id="form-upload">
+                </div>
+            </form>
+            <button id="form-submit" class="btn btn-primary info-btn">
+                保存
+            </button>
+        </div>
+
+
+    </div>
+</div>
+
+</body>
+
+<!--jquery-->
+<script th:src="@{/asserts/js/jquery-3.3.1.min.js}" src="../asserts/js/jquery-3.3.1.min.js"></script>
+<script th:src="@{/asserts/layer/layer.js}"></script>
+
+<script th:src="@{/asserts/js/bootstrap.min.js}" src="../asserts/js/bootstrap.min.js"></script>
+<!-- 下拉动态效果 -->
+<script th:src="@{/asserts/js/bootstrap-dropdown-on-hover.js}"
+        src="../asserts/js/bootstrap-dropdown-on-hover.js"></script>
+
+<!--引入发表问题-->
+<script th:replace="~{commons/bar::select_tag}"></script>
+<!--引入许愿模态框-->
+<div th:replace="~{commons/bar::ask_question}"></div>
+<!--引入反馈模态框-->
+<div th:replace="~{commons/bar::feedback}"></div>
+
+
+<!--压缩图片-->
+<script src="http://i.gtimg.cn/qzone/biz/gdt/lib/jquery/jquery-2.1.4.js?max_age=31536000"></script>
+
+<!--压缩图片后为base64，需转成blob，再转成file-->
+<script>
+
+    $(function () {
+        $("#account-password").click(function () {
+            layer.msg('该功能懒得做了...', {icon: 5});
+        });
+    });
+    
+    $(function () {
+        var userId = $("#user-id").val();
+        var sessionId = $("#session-id").val();
+        if(sessionId == null || sessionId != userId) {
+            $(location).attr("href","/user/settings_info/error");
+        }
+
+        var t_file;
+
+        $('#form-upload').on('change', function () {
+            var filePath = $(this).val(),         //获取到input的value，里面是文件的路径
+                fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase(),
+                imgBase64 = '',      //存储图片的imgBase64
+                fileObj = document.getElementById('form-upload').files[0]; //上传文件的对象,要这样写才行，用jquery写法获取不到对象
+
+            // 检查是否是图片
+            if (!fileFormat.match(/.png|.jpg|.jpeg/)) {
+                alert('上传错误,文件格式必须为：png/jpg/jpeg');
+                return;
+            }
+
+            // 调用函数，对图片进行压缩
+            compress(fileObj, function (imgBase64) {
+                imgBase64 = imgBase64;    //存储转换的base64编码
+                $('#form-photo').attr('src', imgBase64); //显示预览图片
+            });
+        });
+
+        // 不对图片进行压缩，直接转成base64
+        function directTurnIntoBase64(fileObj, callback) {
+            var r = new FileReader();
+            // 转成base64
+            r.onload = function () {
+                //变成字符串
+                imgBase64 = r.result;
+                console.log(imgBase64);
+                callback(imgBase64);
+            }
+            r.readAsDataURL(fileObj);    //转成Base64格式
+        }
+
+        // 对图片进行压缩
+        function compress(fileObj, callback) {
+            if (typeof (FileReader) === 'undefined') {
+                console.log("当前浏览器内核不支持base64图标压缩");
+                //调用上传方式不压缩
+                directTurnIntoBase64(fileObj, callback);
+            } else {
+                try {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var image = $('<img/>');
+                        image.load(function () {
+                            square = 150,   //定义画布的大小，也就是图片压缩之后的像素
+                                canvas = document.createElement('canvas'),
+                                context = canvas.getContext('2d'),
+                                imageWidth = 0,    //压缩图片的大小
+                                imageHeight = 0,
+                                offsetX = 0,
+                                offsetY = 0,
+                                data = '';
+
+                            canvas.width = square;
+                            canvas.height = square;
+                            context.clearRect(0, 0, square, square);
+
+                            if (this.width > this.height) {
+                                imageWidth = Math.round(square * this.width / this.height);
+                                imageHeight = square;
+                                offsetX = -Math.round((imageWidth - square) / 2);
+                            } else {
+                                imageHeight = Math.round(square * this.height / this.width);
+                                imageWidth = square;
+                                offsetY = -Math.round((imageHeight - square) / 2);
+                            }
+                            context.drawImage(this, offsetX, offsetY, imageWidth, imageHeight);
+                            var data = canvas.toDataURL('image/jpeg');
+                            var blob = dataURLtoBlob(data);
+                            console.log(blob);
+                            t_file = new File([blob], "img.jpg", {type: "image/jpeg", lastModified: Date.now()});
+                            console.log(t_file);
+                            //压缩完成执行回调
+                            callback(data);
+                        });
+                        image.attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(fileObj);
+                } catch (e) {
+                    console.log("压缩失败!");
+                    //调用直接上传方式  不压缩
+                    directTurnIntoBase64(fileObj, callback);
+                }
+            }
+        }
+
+        //点击保存按钮修改信息+上传图片
+        $("#form-submit").click(function () {
+            if($("#form-name").val().length > 15) {
+                alert("昵称不能超过15个字符！");
+                return;
+            }
+
+            if($("#form-signature").val().length > 30) {
+                alert("个性签名不能超过30个字符！");
+                return;
+            }
+            updateUser();   //更新用户信息
+            if(t_file == null){ //如果没选图片，就不往下执行
+                return;
+            }
+            var formData = new FormData();
+            formData.append("file",t_file);
+            $.ajax({
+                "url": "/user/update_settings_info_avatar",
+                "data": formData,
+                "processData": false,
+                "contentType": false,
+                "type": "POST",
+                "dataType": "json",
+                "error": function (result) {
+                    alert("error!");
+                }
+            });
+        });
+
+        function updateUser() {
+            $.ajax({
+                url: "/user/update_settings_info",
+                type: "POST",
+                data: $("#form-data").serialize(),
+                success: function (result) {
+                  if(result==true){
+                      layer.msg('修改成功！', {icon: 6});
+                  }
+                },
+                error: function (result) {
+                    alert("error!!!");
+                }
+            })
+        }
+
+    });
+
+    function dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+    }
+
+</script>
+
+</html>

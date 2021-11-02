@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>首页——校园智慧讯息平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../asserts/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../asserts/css/cover.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]>
+    <script src="../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../asserts/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body style="background-color: #F6F4EC">
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <!--<div class="masthead-brand"><img src="../asserts/img/aladdin1.png" width="40%"></div>-->
+                    <nav>
+                        <ul class="nav masthead-nav">
+                            <li class="active"><a href="#">首页</a></li>
+                            <li><a class="font-bg" th:href="@{'/user/homepage/'+${session.user.id}}" th:if="${session.user != null}"
+                                   th:text="${session.user.userName}"></a></li>
+                            <li><a class="font-bg" th:if="${session.user == null}" th:text="登录" href="/toLogin"></a></li>
+                            <li><a class="font-bg" href="/toRegister" th:if="${session.user == null}" th:text="注册"></a></li>
+                            <li><a class="font-bg"  th:text="通知"></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+
+            <div class="inner cover">
+                <!-- ../asserts/img/kuangda.png -->
+                <div class="cover-heading"><img src="../asserts/img/kd.png" height="20%"></div>
+                <p class="lead">
+                <div class="input-group input-xxlarge">
+                        <input id="search-msg" type="text" class="form-control" placeholder="你想了解哪些信息？"
+                               aria-describedby="basic-addon2" style="background-color: #F6F4EC;">
+                        <span class="input-group-btn" id="basic-addon2">
+                  <button id="search-btn" class="btn btn-default" style="background-color: #F6F4EC;">
+                      <i class="glyphicon glyphicon-search"></i>
+                  </button>
+              </span>
+                </div>
+                </p>
+                <br>
+                <p class="lead">
+                    <a id="enter-btn" href="/user/index" class="btn btn-lg btn-default font-bg" style="background-color: #F6F4EC;">进 去 看 看
+                        吧</a>
+                </p>
+            </div>
+
+            <br>
+            <br>
+            <br>
+
+            <div class="mastfoot">
+                <div class="inner font-bg">
+                    <p>这是一个校园智慧讯息平台，由郑永康大创小组开发</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Bootstrap core JavaScript
+     Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../asserts/js/jquery.min.js"><\/script>')</script>
+<script src="../asserts/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../asserts/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+
+<script>
+    $(function () {
+        $("#search-btn").hover(function () {
+            $(this).css("background-color","blanchedalmond");
+        },function () {
+            $(this).css("background-color","#F6F4EC");
+        });
+
+        $("#enter-btn").hover(function () {
+           $(this).css("background-color","blanchedalmond");
+        },function () {
+           $(this).css("background-color","#F6F4EC");
+        });
+
+        $("#search-btn").click(function () {
+            var searchStr = $("#search-msg").val();
+            $(location).attr("href","/user/index"+"?searchStr="+searchStr);
+        });
+        $("#search-msg").keyup(function () {
+            if (event.keyCode == 13) {
+                $("#search-btn").click();
+            }
+        });
+
+    })
+</script>
+
+</html>

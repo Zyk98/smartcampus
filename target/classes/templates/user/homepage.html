@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的主页——校园智慧讯息平台</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/asserts/css/bootstrap.min.css}" href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/font-awesome.min.css}" href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- 本地CSS -->
+    <link th:href="@{/asserts/css/nav-common.css}" href="../asserts/css/nav-common.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/homepage.css}" href="../asserts/css/homepage.css" rel="stylesheet">
+
+
+    <!--下拉框动态效果-->
+    <link th:href="@{/asserts/css/animations.css}" href="../asserts/css/animations.css" rel="stylesheet">
+</head>
+<body style="background-color: #F6F4EC">
+
+<!--引入导航条-->
+<div th:replace="~{commons/bar::topbar}"></div>
+<!--引入许愿模态框-->
+<div th:replace="~{commons/bar::ask_question}"></div>
+<!--引入反馈模态框-->
+<div th:replace="~{commons/bar::feedback}"></div>
+
+<div class="col-md-10 main">
+    <div class="home-leftside">
+        <div style="height: 150px;border: 1px solid #ddd;width: 150px;">
+            <img id="home-photo" class="home-photo" style="border-radius: 8px;" src="../asserts/img/user-Skyed_blue.jpg">
+        </div>
+        <div id="home-name" class="home-name">Skyed_blue</div>
+        <div>
+            <ul class="list-group">
+                <li class="list-group-item">我的关注
+                    <div id="follow-count" class="list-num"></div>
+                </li>
+                <li class="list-group-item">我的粉丝
+                    <div id="follower-count" class="list-num"></div>
+                </li>
+            </ul>
+        </div>
+        <div id="follow-btn" class="btn btn-info" style="width: 100%; display: none;">关注ta</div>
+    </div>
+
+    <input id="session-id" type="hidden" th:if="${session.user!=null}"  th:value="${session.user.id}">
+    <input id="session-role" type="hidden" th:if="${session.user!=null}"  th:value="${session.user.role}">
+    <div class="col-md-8 home-main">
+        <div class="home-main-head">
+            <ul class="nav nav-pills">
+                <li id="question-attend" role="presentation" class="nav-selected font-bg font-bg active"><a href="#">关注的问题</a></li>
+                <li id="question-ask" class="nav-selected font-bg" role="presentation"><a href="#">我的提问</a></li>
+                <li id="answer" class="nav-selected font-bg" role="presentation"><a href="#">我的回答</a></li>
+                <li id="answer-collect" class="nav-selected font-bg" role="presentation"><a href="#">我的收藏</a></li>
+                <li id="info" class="nav-selected font-bg" role="presentation"><a href="#">我的通知</a></li>
+                <li id="dynamic" class="nav-selected font-bg" role="presentation"><a href="#">关注动态</a></li>
+                <li id="follow" class="nav-selected font-bg" role="presentation"><a href="#">我的关注</a></li>
+                <li id="follower" class="nav-selected font-bg" role="presentation"><a href="#">我的粉丝</a></li>
+                <li th:if="${session.user!=null && session.user.role == 'admin'}" id="feedback" class="nav-selected font-bg" role="presentation"><a href="#">反馈</a></li>
+            </ul>
+        </div>
+        <div id="main-body" class="home-main-body">
+            <!--<div class="home-main-item">
+                <div class="home-main-list">
+                    <div class="body-content"><a>关注的问题？</a></div>
+                    <div class="body-time">2020-05-11</div>
+                    <div class="body-comment"><i class="glyphicon glyphicon-comment"></i>15</div>
+                    <div class="body-view"><i class="glyphicon glyphicon-eye-open"></i>1636</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-list">
+                    <div class="body-content"><a>我的提问？</a></div>
+                    <div class="body-time">2020-05-11</div>
+                    <div class="body-comment"><i class="glyphicon glyphicon-comment"></i>15</div>
+                    <div class="body-view"><i class="glyphicon glyphicon-eye-open"></i>1636</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-list">
+                    <a>
+                        <div class="body-content">我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？我的回答？</div>
+                    </a>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-list">
+                    <div class="body-content"><a>我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？我的收藏？</a></div>
+                    <br>
+                    <div class="body-user">来自 <a>@Skyed_blue</a> 的回答</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-comment" style="color: blue;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>回答问题通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 回答了你的问题</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-thumbs-up" style="color: cornflowerblue;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>回答/评论点赞通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 赞了你的回答/评论</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-thumbs-down" style="color: cornflowerblue;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>回答/评论踩通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 踩了你的回答/评论</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-star" style="color: burlywood;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>回答收藏通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 收藏了你的回答</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-comments" style="color: blue;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>回答评论通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 评论了你的回答：</div>
+                    <div class="body-msg">好活！好活！</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-heart" style="color: deeppink;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>用户关注通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@Skyed_blue</a> 关注了你</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-exclamation-triangle" style="color: sandybrown;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>管理员警告问题/回答通知？
+                        管理员警告问题/回答通知？
+                        管理员警告问题/回答通知？
+                        管理员警告问题/回答通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@管理员</a> 警告了你的问题/回答：</div>
+                    <div class="body-msg">内容过于弱智，请重新修改！</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-trash" style="color: red;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>管理员删除问题/回答通知？</a></div>
+                    <br>
+                    <div class="body-user"><a>@管理员</a> 删除了你的问题/回答：</div>
+                    <div class="body-msg">内容过于弱智，已强制删除！</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-icon"><i class="fa fa-meh-o" style="color: red;"></i></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>管理员已将你禁言了！</a></div>
+                    <br>
+                    <div class="body-msg">因开车频繁，已将你小黑屋处理，永不见光明！</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-list">
+                    <div class="body-content"><a>关注用户的提问/回答动态：</a></div>
+                    <br>
+                    <div class="body-user">来自 <a>@Skyed_blue</a> 的提问/回答</div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-list">
+                    <div class="body-content"><a>反馈标题</a></div>
+                    <br>
+                    <div class="body-msg">反馈正文</div>
+                    <div class="body-time"><a>@Skyed_blue</a></div>
+                    <div class="body-time">2020-05-11</div>
+                </div>
+            </div>-->
+            <!--<div class="home-main-item">
+                <div class="home-main-img"><img src="../asserts/img/user-default.jpg"></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>Skyed_blue</a></div>
+                    <br>
+                    <div class="body-user">生活不易，多才多艺...</div>
+                </div>
+            </div>
+            <div class="home-main-item">
+                <div class="home-main-img"><img src="../asserts/img/user-default.jpg"></div>
+                <div class="home-main-list">
+                    <div class="body-content"><a>Skyed_blue</a></div>
+                    <br>
+                    <div class="body-user">生活不易，多才多艺...</div>
+                </div>
+            </div>-->
+
+        </div>
+    </div>
+</div>
+
+
+</body>
+<!--jquery-->
+<script th:src="@{/asserts/js/jquery-3.3.1.min.js}" src="../asserts/js/jquery-3.3.1.min.js"></script>
+
+<script th:src="@{/asserts/js/bootstrap.min.js}" src="../asserts/js/bootstrap.min.js"></script>
+<!-- 下拉动态效果 -->
+<script th:src="@{/asserts/js/bootstrap-dropdown-on-hover.js}"
+        src="../asserts/js/bootstrap-dropdown-on-hover.js"></script>
+
+<script th:src="@{/asserts/layer/layer.js}"></script>
+
+<!--引入发表问题-->
+<script th:replace="~{commons/bar::select_tag}"></script>
+
+
+<script>
+    $(function () {
+        var curUrl = window.location.pathname;
+        var url = "/user/getQuestionAttend";
+        var followBtnFlag;
+
+        var sessionId = $("#session-id").val();
+        var sessionRole = $("#session-role").val();
+        var userId = curUrl.replace(/[^0-9]/ig, "");
+        var curSelected = $(".active").text().trim();
+
+
+        /*nav点击事件*/
+        navClick();
+        /*用户信息*/
+        getUserInfoByAjax();
+        /*关注按钮展示*/
+        followBtnDisplay();
+        /*关注按钮点击*/
+        followBtnClick();
+        /*通知删除按钮被点击*/
+        deleteBtnClick();
+        /*我的通知和关注动态展示*/
+        infoAndDynamicDisplay();
+        /*反馈删除按钮点击*/
+        feedbackDeleteBtnClick();
+
+
+        function infoAndDynamicDisplay() {
+            if(sessionId == null || (sessionId != null && sessionId != userId)) {
+                $("#info").hide();
+                $("#dynamic").hide();
+            }
+        }
+
+        /*反馈删除按钮点击*/
+        function feedbackDeleteBtnClick() {
+            $("body").on("click",".feedback-delete-btn",function () {
+                $.ajax({
+                    url: "/user/deleteFeecback",
+                    type: "post",
+                    data: {feedbackId:$(this).val()},
+                    success: function (result) {
+                        getFeedbackByAjax();
+                    },error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+
+        /*通知删除按钮点击*/
+        function deleteBtnClick() {
+            $("body").on("click",".message-delete-btn",function () {
+                $.ajax({
+                    url: "/user/deleteMessage",
+                    type: "post",
+                    data: {messageId:$(this).val()},
+                    success: function (result) {
+                        getInfoByAjax();
+                    },error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+        /*关注按钮展示*/
+        function followBtnDisplay() {
+            /*在关注粉丝表中查找session的id是否是userId的粉丝*/
+            if(sessionId != null && sessionId != userId) {
+                $("#follow-btn").css("display","block");
+                $.ajax({
+                    url: "/user/isFollower",
+                    type: "post",
+                    data: {sessionId:sessionId,userId:userId},
+                    success: function (result) {
+                        if(result == true) {
+                            followBtnFlag = true;
+                            $("#follow-btn").removeClass("btn-info").addClass("btn-default").text("取消关注");
+                        } else {
+                            followBtnFlag = false;
+                            $("#follow-btn").removeClass("btn-default").addClass("btn-info").text("关注ta");
+                        }
+                    },
+                    error: function () {
+                        alert("error!");
+                    }
+                });
+            }
+            else {
+                $("#follow-btn").css("display","none");
+            }
+        }
+        /*关注按钮点击*/
+        function followBtnClick() {
+            $("#follow-btn").click(function () {
+                if(followBtnFlag == null) return;
+                var followUrl;
+                if(followBtnFlag == false) followUrl = "/user/addFollow";
+                else followUrl = "/user/deleteFollow";
+                $.ajax({
+                    url: followUrl,
+                    type: "post",
+                    data: {sessionId:sessionId,userId:userId},
+                    success: function (result) {
+                        if(result == false) {
+                            alert("操作失败！");
+                        }
+                        followBtnDisplay();
+                    },
+                    error: function () {
+                        alert("error!");
+                    }
+                })
+            })
+        }
+        /*用户信息*/
+        function getUserInfoByAjax() {
+            $.ajax({
+                url: "/user/getUserInfo",
+                type:"post",
+                data:{userId:userId},
+                success: function (result) {
+                    $("#home-name").text(result.user.nickName);
+                    $("#home-photo").attr("src",result.user.photoUrl);
+                    $("#follow-count").text(result.followCount);
+                    $("#follower-count").text(result.followerCount);
+                }, error: function () {
+                    alert("error!");
+                }
+            })
+        }
+        /*我的关注*/
+        function getFollowByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: "/user/getFollow",
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var list = result;
+                    for(var i in list) {
+                        var userUrl = "/user/homepage/"+list[i].id;
+                        $("#main-body")
+                            .append("<div class=\"home-main-item\">\n" +
+                                "                <div class=\"home-main-img\"><a href="+userUrl+"><img width='50px' src="+list[i].photoUrl+"></a></div>\n" +
+                                "                <div class=\"home-main-list\">\n" +
+                                "                    <div class=\"body-content\"><a href="+userUrl+">"+list[i].nickName+"</a></div>\n" +
+                                "                    <br>\n" +
+                                "                    <div class=\"body-user\">"+list[i].signature+"</div>\n" +
+                                "                </div>\n" +
+                                "            </div>")
+                    }
+                    layer.close(load);
+                }
+            })
+        }
+        /*我的粉丝*/
+        function getFollowerByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: "/user/getFollower",
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var list = result;
+                    for(var i in list) {
+                        var userUrl = "/user/homepage/"+list[i].id;
+                        $("#main-body")
+                            .append("<div class=\"home-main-item\">\n" +
+                                "                <div class=\"home-main-img\"><a href="+userUrl+"><img width='50px' src="+list[i].photoUrl+"></a></div>\n" +
+                                "                <div class=\"home-main-list\">\n" +
+                                "                    <div class=\"body-content\"><a href="+userUrl+">"+list[i].nickName+"</a></div>\n" +
+                                "                    <br>\n" +
+                                "                    <div class=\"body-user\">"+list[i].signature+"</div>\n" +
+                                "                </div>\n" +
+                                "            </div>")
+                    }
+                    layer.close(load);
+                }
+            })
+        }
+        /*反馈*/
+        function getFeedbackByAjax() {
+            $.ajax({
+                url: url,
+                type: "post",
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var list = result;
+                    for(var i in list) {
+                        $("#main-body")
+                            .append("<div class=\"home-main-item\">\n" +
+                                "                <div class=\"home-main-list\">\n" +
+                                "                    <div class=\"body-content\"><a>"+list[i].title+"</a></div>\n" +
+                                "                    <br>\n" +
+                                "                    <div class=\"body-msg\">"+list[i].content+"</div>\n" +
+                                "                     <button class='btn btn-danger btn-sm feedback-delete-btn' value="+list[i].id+">删除</button>\n" +
+                                "                    <div class=\"body-time\">"+timeFormat(list[i].updateTime)+"</div>\n" +
+                                "                    <div style='margin-right: 15px;' class=\"body-time\"><a href="+list[i].userUrl+">@"+list[i].userName+"</a></div>\n" +
+                                "                </div>\n" +
+                                "            </div>");
+                    }
+                },error: function () {
+                    alert("error!");
+                }
+            })
+        }
+        /*关注动态*/
+        function getDynamicByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var list = result;
+                    for(var i in list){
+                        $("#main-body")
+                            .append("<div class=\"home-main-item\">\n" +
+                                "                <div class=\"home-main-list\">\n" +
+                                "                    <div class=\"body-content\"><a href="+list[i].titleUrl+">"+list[i].title+"</a></div>\n" +
+                                "                    <br>\n" +
+                                "                    <div class=\"body-user\">来自 <a href="+list[i].userUrl+">@"+list[i].userName+"</a> 的"+list[i].content+"</div>\n" +
+                                "                    <div class=\"body-time\">"+timeFormat(list[i].updateTime)+"</div>\n" +
+                                "                </div>\n" +
+                                "            </div>")
+                    }
+                    layer.close(load);
+                },
+                error: function () {
+                    alert("error!");
+                }
+            });
+        }
+        /*我的通知*/
+        function getInfoByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#message-total").css("display","none");
+                    var list = result;
+                    $("#main-body").find(".home-main-item").remove();
+                    for(var i in list) {
+                        var msgId = 'body-msg'+i;
+                        $("#main-body")
+                            .append("<div class=\"home-main-item\">\n" +
+                                "                <div class=\"home-main-icon\"><i class=\"fa "+list[i].icon+"\" style=\"color: "+list[i].color+"\"></i></div>\n" +
+                                "                <div class=\"home-main-list\">\n" +
+                                "                    <div class=\"body-content\"><a href="+list[i].titleUrl+">"+list[i].title+"</a></div>\n" +
+                                "                    <br>\n" +
+                                "                    <div class=\"body-user\"><a href="+list[i].userUrl+">@"+list[i].userName+"</a>"+list[i].content+"</div>\n" +
+                                "                    <div id="+msgId+" class=\"body-msg\"></div>\n" +
+                                "                     <button class='btn btn-danger btn-sm message-delete-btn' value="+list[i].id+">删除</button>\n" +
+                                "                    <div class=\"body-time\">"+timeFormat(list[i].updateTime)+"</div>\n" +
+                                "                </div>\n" +
+                                "            </div>");
+                        if(list[i].msg != null) {
+                            $("#main-body").find("#"+msgId).text(list[i].msg);
+                        }
+                        layer.close(load);
+                    }
+                },error: function () {
+                    alert("error!");
+                }
+            });
+        }
+        /*我的收藏*/
+        function getCollectAnswerByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var titleList = result.titleList;
+                    var answerUrlList = result.answerUrlList;
+                    var nameList = result.nameList;
+                    var userUrlList = result.userUrlList;
+                    var timeList = result.timeList;
+                    for(var i in titleList){
+                        $("#main-body").
+                        append("<div class=\"home-main-item\">\n" +
+                            "                <div class=\"home-main-list\">\n" +
+                            "                    <div class=\"body-content\"><a href="+answerUrlList[i]+">"+titleList[i]+"</a></div>\n" +
+                            "                    <br>\n" +
+                            "                    <div class=\"body-user\">来自 <a href="+userUrlList[i]+">@"+nameList[i]+"</a> 的回答</div>\n" +
+                            "                    <div class=\"body-time\">"+timeFormat(timeList[i])+"</div>\n" +
+                            "                </div>\n" +
+                            "            </div>");
+                    }
+                    layer.close(load);
+
+                },error: function () {
+                    alert("error!");
+                }
+            });
+        }
+        /*我的回答*/
+        function getAnswerByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var titleList = result.titleList;
+                    var urlList = result.urlList;
+                    var timeList = result.timeList;
+                    for(var i in titleList){
+                        var answerUrl = urlList[i];
+                        $("#main-body").
+                        append("<div class=\"home-main-item\">\n" +
+                            "                <div class=\"home-main-list\">\n" +
+                            "                    <div class=\"body-content\"><a href="+answerUrl+">"+titleList[i]+"</a></div>\n" +
+                            "                    <div class=\"body-time\">"+timeFormat(timeList[i])+"</div>\n" +
+                            "                </div>\n" +
+                            "            </div>");
+                    }
+                    layer.close(load);
+                },error: function () {
+                    alert("error!");
+                }
+            })
+        }
+        /*关注的问题，我的提问*/
+        function getQuestionByAjax() {
+            var load = layer.msg('服务器正在请求中', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {userId:userId},
+                success: function (result) {
+                    $("#main-body").find(".home-main-item").remove();
+                    var list = result;
+                    for(var i in list){
+                        var questionUrl = "/user/question/"+list[i].id;
+                        $("#main-body").
+                        append("<div class=\"home-main-item\">\n" +
+                            "                <div class=\"home-main-list\">\n" +
+                            "                    <div class=\"body-content\"><a href="+questionUrl+">"+list[i].title+"</a></div>\n" +
+                            "                    <div class=\"body-time\">"+list[i].updateTime+"</div>\n" +
+                            "                    <div class=\"body-comment\"><i class=\"glyphicon glyphicon-comment\"></i>"+list[i].answerCount+"</div>\n" +
+                            "                    <div class=\"body-view\"><i class=\"glyphicon glyphicon-eye-open\"></i>"+list[i].viewCount+"</div>\n" +
+                            "                </div>\n" +
+                            "            </div>");
+                    }
+                    layer.close(load);
+                },error: function () {
+                    alert("error!");
+                }
+            })
+        }
+        /*nav点击事件*/
+        function navClick() {
+            $(".nav-selected").click(function () {
+                $(".active").removeClass("active");
+                $(this).addClass("active");
+                curSelected = $(this).text();
+
+                if(curSelected == "关注的问题") {url = "/user/getQuestionAttend";getQuestionByAjax();}
+                else if(curSelected == "我的提问") {url = "/user/getQuestionAsk";getQuestionByAjax();}
+                else if(curSelected == "我的回答") {url = "/user/getAnswerMake";getAnswerByAjax();}
+                else if(curSelected == "我的收藏") {url = "/user/getAnswerCollect";getCollectAnswerByAjax();}
+                else if(curSelected == "我的通知") {url = "/user/getInfo";getInfoByAjax();}
+                else if(curSelected == "关注动态") {url = "/user/getDynamic";getDynamicByAjax();}
+                else if(curSelected == "我的关注") {url = "/user/getFollow";getFollowByAjax();}
+                else if(curSelected == "我的粉丝") {url = "/user/getFollower";getFollowerByAjax();}
+                else {url = "/user/getFeedback";getFeedbackByAjax();}
+            });
+            //一开始展现的内容
+            if(location.search.indexOf("str=message") >= 0) {
+                $("#info").click();
+            } else $("#question-attend").click();
+        }
+        /*时间格式转换*/
+        function timeFormat(time) {
+            var d = new Date(time);
+
+            var year = d.getFullYear();       //年
+            var month = d.getMonth() + 1;     //月
+            var day = d.getDate();            //日
+
+            var hh = d.getHours();            //时
+            var mm = d.getMinutes();          //分
+            var ss = d.getSeconds();           //秒
+
+            var clock = year + "-";
+
+            if (month < 10)
+                clock += "0";
+
+            clock += month + "-";
+
+            if (day < 10)
+                clock += "0";
+
+            clock += day + " ";
+
+            if (hh < 10)
+                clock += "0";
+
+            clock += hh + ":";
+            if (mm < 10) clock += '0';
+            clock += mm + ":";
+
+            if (ss < 10) clock += '0';
+            clock += ss;
+            return (clock);
+        }
+
+    })
+</script>
+
+<script>
+    $(function () {
+        $(".dropdown").bootstrapDropdownOnHover({
+            /*鼠标离开后停留时间*/
+            mouseOutDelay: 200
+        });
+    })
+</script>
+</html>

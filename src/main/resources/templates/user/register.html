@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>注册页——校园智慧讯息平台</title>
+
+    <!-- Bootstrap -->
+    <link href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../asserts/css/nprogress.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="../asserts/css/animate.min.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../asserts/css/login.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="login_main">
+        <!--<img src="../asserts/img/login_wallpaper.jpg" height="801px" width="100%">-->
+        <div class="login_body">
+            <form class="" th:action="@{/register}" method="post">
+                <img class="login_title" src="../asserts/img/kd.png" width="126px">
+                <br>
+                <div class="form-group">
+                    <input type="text" id="edit_email" name="email" class="form-control" placeholder="邮箱" required=""/>
+                    <i class="form-icon"></i>
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="edit_name" name="userName" class="form-control" placeholder="用户名"
+                           required=""/>
+                    <i class="form-icon"></i>
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="edit_password" name="password" class="form-control" placeholder="密码"
+                           required=""/>
+                    <i class="form-icon"></i>
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="edit_confirmpwd" class="form-control" placeholder="确认密码" required=""/>
+                    <i class="form-icon"></i>
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <input id="edit_register" type="submit" th:value="注册" class="btn btn-info btn-lg btn-block"
+                           style="font-size: 16px; width: 90%"/>
+                    <i class="form-icon"></i>
+                </div>
+                <a href="/toLogin">
+                <div class="font-bg" style="margin-right: 37px;color: darkseagreen;float: right;">已有账号？前往登录<i class="fa fa-angle-double-right"></i></div>
+                </a>
+            </form>
+
+        </div>
+</div>
+</body>
+<!--jquery-->
+<script src="../asserts/js/jquery-3.3.1.min.js"></script>
+<!--bootstrap-->
+<!--<script src="../asserts/js/bootstrap.min.js"></script>-->
+
+
+<!--前端校验-->
+<script>
+    //清除样式和内容
+    function clearMsg(ele) {
+        $(ele).next("i").removeClass("glyphicon glyphicon-ok glyphicon-remove").next("span").text("");
+    }
+
+    //校验信息，参数为组件，状态，信息. 在input的父组件(div)加样式，span加消息提示
+    function show_validate_msg(ele, status, msg) {
+        /*先清除原来的痕迹(样式，内容)*/
+        clearMsg(ele);
+
+        if ("success" == status) {
+            $(ele).next("i").addClass("glyphicon glyphicon-ok").css("color","#3CB371").next("span").text(msg).css("color","#3CB371");
+
+        } else if ("error" == status) {
+            $(ele).next("i").addClass("glyphicon glyphicon-remove").css("color","#E9686B").next("span").text(msg).css("color","#E9686B");
+        }
+    }
+
+    //校验数据格式
+    function validate_form() {
+        /*检验邮箱*/
+        clearMsg("#edit_email");
+        var email = $("#edit_email").val();
+        var regEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        if (email.eqnull || !regEmail.test(email)) {
+            show_validate_msg("#edit_email", "error", "邮箱格式不正确！");
+            return false;
+        } else show_validate_msg("#edit_email", "success", "");
+
+        /*检验用户名*/
+        clearMsg("#edit_name");
+        var userName = $("#edit_name").val();
+        var regName = /(^[a-zA-Z0-9_-]{2,16}$)/; //用户名正则，2到16位(字母，数字，下划线，减号)
+        if (userName.eqnull || !regName.test(userName)) {
+            show_validate_msg("#edit_name", "error", "用户名必须是2-16位英文,数字,下划线,减号的组合");
+            return false;
+        } else show_validate_msg("#edit_email", "success", "");
+
+        /*检验密码*/
+        clearMsg("#edit_password");
+        var pwd = $("#edit_password").val();
+        if (pwd.length < 6 || pwd.length > 18) {
+            show_validate_msg("#edit_password", "error", "密码至少在6-18位！");
+            return false;
+        } else show_validate_msg("#edit_email", "success", "");
+
+        /*检验确认密码*/
+        clearMsg("#edit_confirmpwd");
+        var pwdConfirm = $("#edit_confirmpwd").val();
+        if (pwdConfirm != pwd) {
+            show_validate_msg("#edit_confirmpwd", "error", "确认密码与原密码不一致！");
+            return false;
+        } else show_validate_msg("#edit_email", "success", "");
+
+        /*上述校验都通过，true*/
+        return true;
+    }
+
+    //点击注册事件
+    $(function () {
+        $("#edit_register").click(function () {
+            if (!validate_form()) {
+                return false;
+            }
+        })
+    });
+
+    //后端校验邮箱唯一性
+    $("#edit_email").change(function () { //<input>的email改变时触发
+        var emailVal = $(this).val();
+        /*向服务端传email的值进行校验*/
+        $.ajax({
+            url: "/checkEmail",
+            type: "get",
+            data: {"email": emailVal},
+            success: function (result) {
+                /*服务端传flag判断结果，msg提示信息*/
+                if (result.flag) {
+                    show_validate_msg("#edit_email", "success", result.msg);
+                    $("#edit_register").removeAttr("disabled"); //成功，移除disabled属性
+                } else {
+                    show_validate_msg("#edit_email", "error", result.msg);
+                    $("#edit_register").attr("disabled", "disabled"); //失败，给提交按钮加disabled属性表示禁用
+                }
+            }
+        })
+    });
+
+    //后端校验用户名唯一性
+    $("#edit_name").change(function () { //<input>name改变时触发
+        var nameVal = $(this).val();
+        /*向服务端传email的值进行校验*/
+        $.ajax({
+            url: "/checkName",
+            type: "get",
+            data: {"name": nameVal},
+            success: function (result) {
+                /*服务端传flag判断结果，msg提示信息*/
+                if (result.flag) {
+                    show_validate_msg("#edit_name", "success", result.msg);
+                    $("#edit_register").removeAttr("disabled"); //成功，移除disabled属性
+                } else {
+                    show_validate_msg("#edit_name", "error", result.msg);
+                    $("#edit_register").attr("disabled", "disabled"); //失败，给提交按钮加disabled属性表示禁用
+                }
+            }
+        })
+    });
+
+    //校验密码长度
+    $("#edit_password").change(function () {
+        clearMsg("#edit_password");
+        var pwd = $("#edit_password").val();
+        if (pwd.length < 6 || pwd.length > 18) {
+            show_validate_msg("#edit_password", "error", "密码至少在6-18位！");
+            return false;
+        } else show_validate_msg("#edit_password", "success", "");
+    });
+
+    //校验确认密码
+    $("#edit_confirmpwd").change(function () {
+        clearMsg("#edit_confirmpwd");
+        var pwdConfirm = $("#edit_confirmpwd").val();
+        if (pwdConfirm != $("#edit_password").val()) {
+            show_validate_msg("#edit_confirmpwd", "error", "确认密码与原密码不一致！");
+            return false;
+        } else show_validate_msg("#edit_confirmpwd", "success", "");
+    });
+
+</script>
+
+
+</html>

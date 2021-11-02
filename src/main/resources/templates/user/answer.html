@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>回复——校园智慧讯息平台</title>
+
+    <!-- Bootstrap -->
+    <link th:href="@{/asserts/css/bootstrap.min.css}" href="../asserts/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link th:href="@{/asserts/css/font-awesome.min.css}" href="../asserts/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link th:href="@{/asserts/css/nprogress.css}" href="../asserts/css/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link th:href="@{/asserts/css/green.css}" href="../asserts/css/green.css" rel="stylesheet">
+    <!-- bootstrap-wysiwyg -->
+    <link th:href="@{/asserts/css/prettify.min.css}" href="../asserts/css/prettify.min.css" rel="stylesheet">
+    <!-- Select2 -->
+    <link th:href="@{/asserts/css/select2.min.css}" href="../asserts/css/select2.min.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link th:href="@{/asserts/css/switchery.min.css}" href="../asserts/css//switchery.min.css" rel="stylesheet">
+    <!-- starrr -->
+    <link th:href="@{/asserts/css/starrr.css}" href="../asserts/css/starrr.css" rel="stylesheet">
+    <!-- bootstrap-daterangepicker -->
+    <link th:href="@{/asserts/css/daterangepicker.css}" href="../asserts/css/daterangepicker.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link th:href="@{/asserts/css/custom.min.css}" href="../asserts/css/custom.min.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/answer.css}" href="../asserts/css/answer.css" rel="stylesheet">
+    <link th:href="@{/asserts/css/nav-common.css}" href="../asserts/css/nav-common.css" rel="stylesheet">
+</head>
+
+<body style="background-color: #F6F4EC;">
+<!--引入导航条-->
+<div th:replace="~{commons/bar::topbar}"></div>
+<!--引入许愿模态框-->
+<div th:replace="~{commons/bar::ask_question}"></div>
+<!--引入反馈模态框-->
+<div th:replace="~{commons/bar::feedback}"></div>
+
+
+<!--问题-->
+<div class="question-header col-md-6 col-md-offset-0">
+    <div class="x_title body-title">
+        他/她发布的信息是:
+    </div>
+    <div class="question-title" th:text="${question.title}"></div>
+    <div class="question-content" th:text="${question.content}"></div>
+</div>
+
+
+<div class="col-md-12 col-sm-12">
+    <div class="x_panel" style="font-size: 14px; background-color: #F6F4EC">
+        <div class="x_title" style="background-color: #F6F4EC">
+            <div class="body-title">请输入你的所见所闻</div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div id="alerts"></div>
+            <div class="btn-toolbar editor" style="background-color: #F6F4EC" data-role="editor-toolbar"
+                 data-target="#editor-one">
+                <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="字体"><i class="fa fa-font"></i><b
+                            class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    </ul>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="字体大小"><i class="fa fa-text-height"></i>&nbsp;<b
+                            class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a data-edit="fontSize 5">
+                                <p style="font-size:17px">Huge</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-edit="fontSize 3">
+                                <p style="font-size:14px">Normal</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-edit="fontSize 1">
+                                <p style="font-size:11px">Small</p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn" data-edit="bold" title="加粗 (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
+                    <a class="btn" data-edit="italic" title="斜体 (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
+                    <a class="btn" data-edit="strikethrough" title="删除线"><i class="fa fa-strikethrough"></i></a>
+                    <a class="btn" data-edit="underline" title="下划线 (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn" data-edit="insertunorderedlist" title="无序列表"><i class="fa fa-list-ul"></i></a>
+                    <a class="btn" data-edit="insertorderedlist" title="有序列表"><i class="fa fa-list-ol"></i></a>
+                    <a class="btn" data-edit="outdent" title="左缩进 (Shift+Tab)"><i class="fa fa-dedent"></i></a>
+                    <a class="btn" data-edit="indent" title="右缩进 (Tab)"><i class="fa fa-indent"></i></a>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn" data-edit="justifyleft" title="左对齐 (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                    <a class="btn" data-edit="justifycenter" title="居中 (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                    <a class="btn" data-edit="justifyright" title="右对齐 (Ctrl/Cmd+R)"><i
+                            class="fa fa-align-right"></i></a>
+                    <a class="btn" data-edit="justifyfull" title="齐行 (Ctrl/Cmd+J)"><i
+                            class="fa fa-align-justify"></i></a>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="超链接"><i class="fa fa-link"></i></a>
+                    <div class="dropdown-menu input-append">
+                        <input class="span2 form-control" placeholder="URL" type="text" data-edit="createLink"/>
+                        <button class="btn btn-default" type="button">添加</button>
+                    </div>
+                    <a class="btn" data-edit="unlink" title="移除超链接"><i class="fa fa-cut"></i></a>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn" title="插入图片 (复制在线图片的地址直接粘贴即可)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
+                </div>
+
+                <div class="btn-group">
+                    <a class="btn" data-edit="undo" title="撤销 (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
+                    <a class="btn" data-edit="redo" title="重做 (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+                </div>
+            </div>
+
+            <div th:if="${answer == null}" style="background-color: #F6F4EC" id="editor-one"
+                 class="editor-wrapper"></div>
+            <div id="editor-tmp"></div>
+            <input th:if="${answer!=null}" id="editor-content" type="hidden" th:value="${answer.content}">
+        </div>
+        <input type="hidden" id="sessionId" th:value="${session.user.id}">
+        <input type="hidden" id="questionId" th:value="${question.id}">
+        <input th:if="${answer!=null}" type="hidden" id="answerId" th:value="${answer.id}">
+        <div id="answer-submit" class="btn btn-info" style="float: right;margin-top: 20px;">发布</div>
+
+    </div>
+</div>
+
+
+</body>
+
+<!-- jQuery -->
+<script th:src="@{/asserts/js/jquery.min.js}" src="../asserts/js/jquery.min.js"></script>
+<script th:src="@{/asserts/layer/layer.js}"></script>
+<!-- Bootstrap -->
+<script th:src="@{/asserts/js/bootstrap.bundle.min.js}" src="../asserts/js/bootstrap.bundle.min.js"></script>
+<!-- FastClick -->
+<script th:src="@{/asserts/js/fastclick.js}" src="../asserts/js/fastclick.js"></script>
+<!-- NProgress -->
+<script th:src="@{/asserts/js/nprogress.js}" src="../asserts/js/nprogress.js"></script>
+<!-- bootstrap-progressbar -->
+<script th:src="@{/asserts/js/bootstrap-progressbar.min.js}" src="../asserts/js/bootstrap-progressbar.min.js"></script>
+<!-- iCheck -->
+<script th:src="@{/asserts/js/icheck.min.js}" src="../asserts/js/icheck.min.js"></script>
+<!-- bootstrap-daterangepicker -->
+<script th:src="@{/asserts/js/moment.min.js}" src="../asserts/js/moment.min.js"></script>
+<script th:src="@{/asserts/js/daterangepicker.js}" src="../asserts/js/daterangepicker.js"></script>
+<!-- bootstrap-wysiwyg -->
+<script th:src="@{/asserts/js/bootstrap-wysiwyg.min.js}" src="../asserts/js/bootstrap-wysiwyg.min.js"></script>
+<script th:src="@{/asserts/js/jquery.hotkeys.js}" src="../asserts/js/jquery.hotkeys.js"></script>
+<script th:src="@{/asserts/js/prettify.js}" src="../asserts/js/prettify.js"></script>
+<!-- jQuery Tags Input -->
+<script th:src="@{/asserts/js/jquery.tagsinput.js}" src="../asserts/js/jquery.tagsinput.js"></script>
+<!-- Switchery -->
+<script th:src="@{/asserts/js/switchery.min.js}" src="../asserts/js/switchery.min.js"></script>
+<!-- Select2 -->
+<script th:src="@{/asserts/js/select2.full.min.js}" src="../asserts/js/select2.full.min.js"></script>
+<!-- Parsley -->
+<script th:src="@{/asserts/js/parsley.min.js}" src="../asserts/js/parsley.min.js"></script>
+<!-- Autosize -->
+<script th:src="@{/asserts/js/autosize.min.js}" src="../asserts/js/autosize.min.js"></script>
+<!-- jQuery autocomplete -->
+<script th:src="@{/asserts/js/autocomplete.min.js}" src="../asserts/js/jquery.autocomplete.min.js"></script>
+<!-- starrr -->
+<script th:src="@{/asserts/js/starrr.js}" src="../asserts/js/starrr.js"></script>
+<!-- Custom Theme Scripts -->
+<!--<script th:src="@{/asserts/js/custom.min.js}" src="../asserts/js/custom.min.js"></script>-->
+
+<!--引入发表问题-->
+<script th:replace="~{commons/bar::select_tag}"></script>
+
+<script>
+    $(function () {
+        $("#answer-submit").click(function () {
+                /*文本为空并且无子元素*/
+                if ($("#editor-one").text() == "" && $("#editor-one").children().length <= 0) {
+                    layer.msg('回答内容不能为空！', function(){});
+                    return;
+                }
+                var authorId = $("#sessionId").val();
+                var questionId = $("#questionId").val();
+                var content = $("#editor-one")[0].outerHTML;
+                if ($("#answer-submit").text() == "发布") {
+                    $.ajax({
+                        url: "/user/addAnswer",
+                        type: "post",
+                        data: {authorId: authorId, questionId: questionId, content: content},
+                        success: function (result) {
+                            if (result.flag == true) {
+                                layer.msg('发布成功！', {icon: 6});
+                                var answerUrl = "/user" + result.answerUrl;
+                                $(location).attr("href", answerUrl);
+                            }
+                        }, error: function () {
+                            alert("error");
+                        }
+                    })
+
+                } else if($("#answer-submit").text() == "重新发布") {
+                    var answerId = $("#answerId").val();
+                    $.ajax({
+                        url: "/user/editAnswer",
+                        type: "post",
+                        data: {authorId: authorId, questionId: questionId, answerId:answerId, content: content},
+                        success: function (result) {
+                            if (result.flag == true) {
+                                layer.msg('发布成功！', {icon: 6});
+                                var answerUrl = "/user" + result.answerUrl;
+                                $(location).attr("href", answerUrl);
+                            }
+                        }, error: function () {
+                            alert("error");
+                        }
+                    })
+                }
+            }
+        );
+    })
+    ;
+    $(function () {
+        if ($("#editor-one").length <= 0) {
+            var content = $("#editor-content").val();
+            $("#editor-tmp").before(content);
+            $("#answer-submit").text("重新发布");
+        }
+    })
+
+</script>
+
+<script th:src="@{/asserts/js/custom.min.js}" src="../asserts/js/custom.min.js"></script>
+
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<div th:fragment="topbar">
+    <link rel="stylesheet" th:href="@{/asserts/css/layui.css}" href="../asserts/css/layui.css"  media="all">
+
+    <script th:src="@{/asserts/layui.js}" src="../asserts/layui.js" charset="utf-8"></script>
+
+
+    <ul class="layui-nav">
+
+        <li class="layui-nav-item" style="margin-left: 82px;">
+        <a href="/user/index"><img th:src="@{/asserts/img/kd.png}" src="../asserts/img/kd.png" style="width: 100px;"></a>
+        </li>
+
+        <li class="layui-nav-item header-item font-bg" style="margin-right: 92px;" th:if="${session.user == null}">
+            <a th:text="注册" href="/toRegister"></a>
+        </li>
+        <li class="layui-nav-item header-item font-bg" th:if="${session.user == null}">
+            <a th:if="${session.user == null}" th:text="登录" href="/toLogin"></a>
+        </li>
+
+        <li th:if="${session.user!=null}" class="layui-nav-item"  style="float: right;margin-right: 107px;">
+            <a href="javascript:;"><img id="nav-photo" class="layui-nav-img font-bg">我</a>
+            <dl class="layui-nav-child" style="background-color: #F6F4EC;">
+                <dd><a class="font-bg" style="color: #768891" th:if="${session.user != null}" th:href="@{'/user/homepage/'+${session.user.id}}"><i
+                        class="glyphicon glyphicon-user dropdown-padding"></i>&nbsp;&nbsp;主页</a></dd>
+                <dd><a class="font-bg" style="color: #768891" th:if="${session.user != null}" th:href="@{'/user/settings_info/'+${session.user.id}}"><i
+                        class="glyphicon glyphicon-cog dropdown-padding"></i>&nbsp;&nbsp;设置</a></dd>
+                <dd><a class="" style="color: #768891;" href="/logout"><i class="glyphicon glyphicon-off dropdown-padding"></i>&nbsp;&nbsp;登出</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item header-item" th:if="${session.user != null}">
+            <a class="font-bg" id="feedback" href="" th:if="${session.user!=null}" data-toggle="modal" data-target="#modal-feedback"
+               th:text="反馈"></a>
+        </li>
+        <li class="layui-nav-item header-item" th:if="${session.user != null}">
+            <a class="font-bg" id="ask" href="" th:if="${session.user!=null}" data-toggle="modal" data-target=".ask"
+               th:text="发布信息"></a>
+        </li>
+        <li class="layui-nav-item header-item" th:if="${session.user != null}">
+            <a class="font-bg" th:if="${session.user != null}" th:href="@{'/user/homepage/'+${session.user.id}+'?str=message'}"><i class="fa fa-bell-o" style="width: 12px;"></i>
+                <sup id="message-total" class="message-count" style="display: none;"></sup>
+            </a>
+        </li>
+    </ul>
+
+    <script>
+        layui.use('element', function(){
+            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+            //监听导航点击
+            element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });
+        });
+    </script>
+</div>
+
+
+<div th:fragment="ask_question">
+    <div id="modal_ask" class="modal fade ask" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="color: #7687AB">发布信息...</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="form-data">
+                        <input type="hidden" id="userId" th:if="${session.user!=null}" th:value="${session.user.id}">
+                        <input id="title" class="form-control ask_title" name="title" type="text" placeholder="标题...">
+                        <textarea id="content" class="form-control ask_content" name="content" rows="8"
+                                  placeholder="正文..."></textarea>
+                    </form>
+                    <div class="row modal-tag">
+                        <div id="modal-tag-title" class="modal-tag-title">
+                            <div>选择标签(最多选择5个)：</div>
+                        </div>
+                        <!--<button type="button" class="btn btn-default col-md-2 modal-tag-item" value="100">test</button>-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default font-bg" data-dismiss="modal">关闭</button>
+                    <button id="submit" type="button" class="btn btn-primary font-bg">发布</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+<div th:fragment="feedback">
+    <div id="modal-feedback" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="color: #7687AB">反馈</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="modal-feedback-title" placeholder="标题..." class="form-control ask_title"
+                           style="width: 94%;margin-left: 3%;margin-top: 3%;"/>
+                    <textarea id="modal-feedback-content" class="form-control ask_content" rows="8"
+                              style="width: 94%;margin-left: 3%;margin-top: 3%;"
+                              placeholder="正文..."></textarea>
+                    <!--<button type="button" class="btn btn-default col-md-2 modal-tag-item" value="100">test</button>-->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default font-bg" data-dismiss="modal">关闭</button>
+                    <button id="feedback-btn" type="button" class="btn btn-primary font-bg">发布</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+
+</body>
+
+<script th:fragment="dropdown">
+    $(function () {
+        $(".dropdown").bootstrapDropdownOnHover({
+            /*鼠标离开后停留时间*/
+            mouseOutDelay: 300
+        });
+    })
+</script>
+
+<!--添加问题全流程+通知数显示+反馈-->
+<script th:fragment="select_tag">
+    $(function () {
+
+        photoDisplay();
+
+        /*头像显示*/
+        function photoDisplay() {
+            var sessionId = $("#userId").val();
+            if(sessionId == null) return;
+
+            $.ajax({
+                url: "/user/getNavPhoto",
+                type: "post",
+                data: {sessionId:sessionId},
+                success: function (result) {
+                    $("#nav-photo").attr("src",result);
+                },error: function () {
+                    alert("error!");
+                }
+            });
+        }
+
+        getMessageTotal();
+        /*message通知数显示*/
+        function getMessageTotal() {
+            $.ajax({
+                url: "/user/getMessageTotal",
+                type: "post",
+                data: {sessionId: $("#userId").val()},
+                success: function (result) {
+                    if (result) {
+                        if (result > 0) {
+                            $("#message-total").text(result);
+                            $("#message-total").css("display", "inline");
+                        }
+                    }
+                },
+                error: function () {
+                    alert("Error!");
+                }
+            });
+        }
+    });
+
+    $(function () {
+
+        var cnt = 0; //已选标签个数
+
+        /*额外：反馈*/
+        $("#feedback-btn").click(function () {
+            $.ajax({
+                url: "/user/addFeedback",
+                type: "post",
+                data: {sessionId:$("#userId").val(),title:$("#modal-feedback-title").val(),content:$("#modal-feedback-content").val()},
+                success: function (result) {
+                    if(result == true) {
+                        layer.msg('反馈成功！', {icon: 6});
+                        $("#modal-feedback").modal('hide');
+                    } else {
+                        alert("反馈失败！");
+                    }
+                },
+                error: function () {
+                    alert("error!");
+                }
+            })
+        });
+
+
+        /*1.点击按钮获取所有标签*/
+        $("#ask").click(function () {
+
+            $.ajax({
+                url: "/user/getAllTag",
+                type: "post",
+                success: function (result) {
+                    if ($("#modal-tag-title").find(".modal-tag-item").length <= 10) {
+                        var list = result;
+                        for (var i in list) {
+                            $("#modal-tag-title").append("<button type=\"button\" value=\"" + list[i].id + "\" class=\"btn btn-default col-md-2 font-bg modal-tag-item\">"
+                                + list[i].tagName + "</button>");
+                        }
+                    }
+                },
+                error: function (result) {
+                    alert("error!");
+                }
+            })
+        });
+
+        /*2.标记已选(动态生成的元素要用on获取)*/
+        $("body").on("click", ".modal-tag-item", function () {
+            if ($(this).hasClass("btn-default")) {
+                if (cnt >= 5) {
+                    layer.msg('标签别选太多，谢谢您嘞！', function(){});
+                } else {
+                    $(this).removeClass("btn-default").addClass("btn-info");
+                    cnt++;
+                }
+            } else if ($(this).hasClass("btn-info")) {
+                cnt--;
+                $(this).removeClass("btn-info").addClass("btn-default");
+            }
+            console.log(cnt);
+        });
+
+        /*3.点击提交按钮，传选的标签数组，标题，正文*/
+        $("#submit").click(function () {
+            //前端校验
+            var titleLen = $("#title").val().length;
+            var contentLen = $("#content").val().length;
+            if (titleLen < 2 || titleLen > 40) {
+                layer.msg('标题要在2-40个字符范围内！', function(){});
+                return;
+            } else if (contentLen < 2 || contentLen > 200) {
+                layer.msg('正文要在2-200个字符范围内！', function(){});
+                return;
+            } else if (cnt <= 0) {
+//                alert("标签至少选择一个！");
+                layer.msg('标签至少选择一个！', function(){});
+                return;
+            }
+
+            //获取所选标签的id
+            var listId = new Array();
+            $(".modal-tag-item").each(function () {
+                if ($(this).hasClass("btn-info")) {
+                    listId.push($(this).val());
+                }
+            });
+
+            //3个属性封装在一个对象中，因为有数组形式，所以必须转成JSON字符串
+            var data = {
+                userId: $("#userId").val(),
+                list: listId,
+                title: $("#title").val(),
+                content: $("#content").val()
+            };
+            console.log(data);
+
+            $.ajax({
+                url: "/user/addQuestion",
+                type: "post",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8", //转JSON字符串，这个不能忽略
+                success: function (result) {
+                    if (result == true) {
+                        $("#modal_ask").modal("hide");  //退出模态框
+                        $("#form-data")[0].reset(); //清空模态框表单内容
+                        $(".modal-tag-item").each(function () {
+                            if ($(this).hasClass("btn-info")) {
+                                $(this).removeClass("btn-info");
+                                $(this).addClass("btn-default");
+                            }
+                        });
+                        cnt = 0;
+//                        alert("发布成功！");
+                        layer.alert('许愿成功！', {icon: 6});
+                        $(location).attr("href", "/user/index");
+                    } else {
+                        alert("发布失败！");
+                    }
+                },
+                error: function () {
+                    alert("error!");
+                }
+            })
+        });
+
+
+    })
+</script>
+
+
+</html>

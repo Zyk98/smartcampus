@@ -1,0 +1,138 @@
+.header-box {
+    height: 70px;
+    max-height: 70px;
+    background-color: #333333;
+    padding-top: 0px;
+    display: -webkit-box;
+}
+
+.header-logo {
+    padding-left: 8.33%;
+}
+
+.header-user {
+    padding-top: 20px;
+    width: 1152px;
+}
+
+.message-count {
+    font-size: 15px;
+    top: -0.9em;
+    background-color: skyblue;
+    color: #333;
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.header-item {
+    color: lightblue;
+    font-size: 20px;
+    float: right;
+    height: 60px;
+}
+
+
+.ask_title {
+    height: 50px;
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.ask_content {
+    font-size: 16px;
+}
+
+.modal-tag{
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.modal-tag-title {
+    height: 30px;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 16px;
+    border-bottom: 1px solid #dddddd;
+    color: #7687AB;
+    font-weight: bold;
+}
+
+.modal-tag-item{
+    margin-right: 18px;
+    margin-top: 20px;
+}
+
+.form-control {
+    background-color: #F6F4EC;
+}
+
+.modal-content {
+    background-color: #F6F4EC;
+}
+
+.btn-default {
+    background-color: #F6F4EC;
+}
+
+.list-group {
+    background-color: #F6F4EC;
+}
+
+.list-group-item {
+    background-color: #F6F4EC;
+}
+
+.layui-nav-child dd {
+    line-height: 40px;
+    background-color: #F6F4EC;
+}
+
+.layui-layer-move {
+    background-color: #F6F4EC;
+}
+
+.font-bg {
+    transition: 0.2s;
+}
+
+.font-bg:hover {
+    transform:scale(1.5);
+}
+
+.btn {
+    transition: 0.2s;
+    outline:none;
+}
+
+.btn:hover {
+    transform:scale(1.5);
+    outline:none;
+}
+
+.btn:active {
+    outline: none !important;
+}
+
+.btn:focus {
+    outline: none;
+}
+
+
+a{
+    text-decoration: none;
+    /*color: #5887BA;*/
+}
+
+a:hover{
+    text-decoration: none;
+    transform:scale(1.2);
+    color: cornflowerblue;
+}
+
+a:focus {
+    text-decoration: none;
+    color: cornflowerblue;
+}
+
+a:active{text-decoration:none;}
